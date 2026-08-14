@@ -1,0 +1,46 @@
+---
+import { Icon } from '@/components/ui/icon';
+import type { FundingProduct } from '@/data/funding-products';
+
+interface Props {
+  product: Pick<FundingProduct, 'requirements'>;
+}
+
+const { product } = Astro.props;
+const req = product.requirements;
+---
+
+{req && (
+  <section class="bg-secondary w-full py-16 px-10 rounded-xl">
+    <h2 class="mb-12 text-4xl font-semibold text-center">Minimum Requirements</h2>
+    <div class="max-w-6xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div class="flex items-center gap-4">
+        <div class="shrink-0 bg-accent/50 rounded-full p-4 w-16 h-16 flex items-center justify-center">
+          <Icon name="circle-gauge" class="w-7 h-7 text-accent-foreground" />
+        </div>
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Credit Score</p>
+          <p class="text-2xl font-bold">{req.creditScore}</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-4">
+        <div class="shrink-0 bg-accent/50 rounded-full p-4 w-16 h-16 flex items-center justify-center">
+          <Icon name="circle-dollar-sign" class="w-7 h-7 text-accent-foreground" />
+        </div>
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Monthly Revenue</p>
+          <p class="text-2xl font-bold">{req.monthlyRevenue}</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-4">
+        <div class="shrink-0 bg-accent/50 rounded-full p-4 w-16 h-16 flex items-center justify-center">
+          <Icon name="calendar" class="w-7 h-7 text-accent-foreground" />
+        </div>
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Time in Business</p>
+          <p class="text-2xl font-bold">{req.timeInBusiness}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+)}

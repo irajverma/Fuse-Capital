@@ -1,0 +1,106 @@
+---
+export const prerender = true;
+import { Picture, getImage } from 'astro:assets';
+import Layout from '../../layouts/Layout.astro';
+
+import { Button } from '@/components/ui/button';
+import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupText } from '@/components/ui/input-group';
+
+import ProductStats from '@/components/ProductStats.astro';
+import { fundingProducts } from '@/data/funding-products';
+const product = fundingProducts.find(p => p.href === '/products/term-loans')!;
+
+import heroImg from '../../assets/meeting-office.jpg';
+import secondImg from '../../assets/conversation.jpeg';
+import gradientImage from '../../assets/gradient.webp';
+const optimizedGradient = await getImage({ src: gradientImage, format: 'webp' });
+
+import Calculator from "@/components/Calculator.astro"
+
+import Process from "@/components/Process.astro"
+---
+<Layout title="Term Loans | Funded Experts" description="Explore business term loans available through Funded Experts.">
+  <main>
+    <section class="grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-24 items-center max-w-6xl mx-auto px-6 py-20">
+      <div class="flex flex-col gap-6">
+        <h1 class="text-4xl font-bold leading-tight">Predictable financing to fund what <i>matters most</i>.</h1>
+        <p class="text-lg text-gray-600">Get a lump sum upfront with fixed monthly payments, purpose-built for planned investments and long-term growth.</p>
+        <form action="/solutions/apply" method="get" class="flex items-center gap-2">
+          <InputGroup class="flex-1">
+            <InputGroupAddon align="inline-start">
+              <InputGroupText>$</InputGroupText>
+            </InputGroupAddon>
+            <InputGroupInput type="text" inputmode="numeric" data-format-number name="amount" placeholder="How much money do you need?" class="py-1.5" />
+          </InputGroup>
+          <Button type="submit" class="hover:cursor-pointer shrink-0">Apply Now</Button>
+        </form>
+      </div>
+      <div class="w-full h-full min-w-0 overflow-hidden">
+        <Picture
+          src={heroImg}
+          alt="Business meeting in office"
+          class="w-full h-full object-cover rounded-xl"
+          widths={[400, 800]}
+          formats={['avif', 'webp']}
+        />
+      </div>
+    </section>
+
+    <ProductStats {product} />
+
+
+    <section class="grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-24 items-center max-w-6xl mx-auto px-6 py-20">
+        <div class="w-full h-full min-w-0 overflow-hidden">
+            <Picture
+            src={secondImg}
+            alt="Business building"
+            class="w-full h-full object-cover rounded-xl"
+            widths={[400, 800]}
+            formats={['avif', 'webp']}
+            />
+        </div>
+        <div class="flex flex-col gap-6">
+        <h1 class="text-4xl font-bold leading-tight">How do term loans work?</h1>
+        <p class="text-lg text-gray-600">A business term loan provides a fixed sum of capital that you repay in equal monthly installments over a set period. Approval is based on your credit profile, time in business, and revenue, so stronger businesses typically qualify for lower rates and longer terms. Because the payment schedule never changes, term loans are easy to plan around and well suited for one-time investments like equipment purchases, expansions, or renovations.</p>
+      </div>
+    </section>
+
+    <div class="bg-secondary py-25">
+        <h1 class="mb-12 mt-25 text-4xl font-semibold text-center">See how much you can qualify for:</h1>
+        <Calculator class="mx-auto w-full max-w-6xl"/>
+    </div>
+
+    <div class="text-white py-20 bg-cover bg-center" style={`background-image: url('${optimizedGradient.src}')`}>
+        <Process />
+    </div>
+
+  </main>
+
+<script>
+  function initNumberInputs() {
+    document.querySelectorAll<HTMLInputElement>('[data-format-number]').forEach(input => {
+      if ((input as any)._numInitialized) return;
+      (input as any)._numInitialized = true;
+      input.addEventListener('input', () => {
+        const cursorFromEnd = input.value.length - (input.selectionEnd ?? input.value.length);
+        const raw = input.value.replace(/\D/g, '');
+        const formatted = raw ? Number(raw).toLocaleString('en-US') : '';
+        input.value = formatted;
+        const pos = Math.max(0, formatted.length - cursorFromEnd);
+        input.setSelectionRange(pos, pos);
+      });
+      const form = input.form;
+      if (form) {
+        form.addEventListener('submit', (e) => {
+          e.preventDefault();
+          const url = new URL(form.action, location.origin);
+          url.searchParams.set(input.name, input.value.replace(/\D/g, ''));
+          location.href = url.toString();
+        });
+      }
+    });
+  }
+  initNumberInputs();
+  document.addEventListener('astro:page-load', initNumberInputs);
+</script>
+</Layout>

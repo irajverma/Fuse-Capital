@@ -1,0 +1,62 @@
+---
+export const prerender = true;
+
+import { getCollection, getEntry, type CollectionEntry } from 'astro:content';
+import Layout from '../layouts/Layout.astro';
+import Articles2Block from '@/components/blocks/articles-2.astro';
+import placeholderImage from '@/assets/placeholder.webp';
+
+const FEATURED_ID = 'what-a-broker-costs-you';
+
+const featured = await getEntry('blog', FEATURED_ID);
+
+const rest = (await getCollection('blog', ({ data, id }: CollectionEntry<'blog'>) => !data.draft && id !== FEATURED_ID))
+  .sort((a: CollectionEntry<'blog'>, b: CollectionEntry<'blog'>) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+function initials(name: string) {
+  return name
+    .split(' ')
+    .map((w) => w[0])
+    .join('')
+    .slice(0, 2)
+    .toUpperCase();
+}
+
+function formatDate(date: Date) {
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+---
+
+<Layout title="Blog" description="Insights, guides, and advice for business owners navigating growth.">
+  {featured && (
+    <Articles2Block
+      class="pt-4 2xl:pt-30"
+      featured={{
+        image: { src: featured.data.coverImage ?? placeholderImage, alt: featured.data.title },
+        category: featured.data.tags?.[0] ?? 'Article',
+        title: featured.data.title,
+        description: featured.data.description,
+        href: `/blog/${featured.id}`,
+        author: {
+          image: featured.data.authorImage,
+          initials: initials(featured.data.author),
+          name: featured.data.author,
+          date: formatDate(featured.data.pubDate),
+        },
+      }}
+      articles={rest.map((post) => ({
+        image: { src: post.data.coverImage ?? placeholderImage, alt: post.data.title },
+        category: post.data.tags?.[0] ?? 'Article',
+        title: post.data.title,
+        description: post.data.description,
+        href: `/blog/${post.id}`,
+        author: {
+          image: post.data.authorImage,
+          initials: initials(post.data.author),
+          name: post.data.author,
+          date: formatDate(post.data.pubDate),
+        },
+      }))}
+    />
+  )}
+</Layout>

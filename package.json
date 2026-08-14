@@ -1,0 +1,55 @@
+{
+	"name": "fundedexperts-frontend",
+	"type": "module",
+	"version": "0.0.1",
+	"engines": {
+		"node": ">=22.12.0"
+	},
+	"scripts": {
+		"dev-vars": "node scripts/dev-vars.mjs",
+		"dev": "node scripts/dev-vars.mjs --watch -- astro dev",
+		"dev:wrangler": "pnpm dev-vars && CLOUDFLARE_VITE_FORCE_LOCAL=true astro build && node scripts/dev-vars.mjs --watch -- wrangler dev",
+		"build": "CLOUDFLARE_VITE_FORCE_LOCAL=true astro build",
+		"preview": "CLOUDFLARE_VITE_FORCE_LOCAL=true astro build && wrangler dev --port 8788",
+		"astro": "astro",
+		"test": "vitest run",
+		"test:watch": "vitest",
+		"cf-typegen": "wrangler types"
+	},
+	"dependencies": {
+		"@astrojs/cloudflare": "^13.7.0",
+		"@astrojs/mdx": "^6.0.3",
+		"@astrojs/sitemap": "^3.7.3",
+		"@data-slot/accordion": "^0.2.166",
+		"@data-slot/collapsible": "^0.2.166",
+		"@data-slot/combobox": "^0.2.166",
+		"@data-slot/dialog": "^0.2.166",
+		"@data-slot/dropdown-menu": "^0.2.166",
+		"@data-slot/navigation-menu": "^0.2.166",
+		"@data-slot/radio-group": "^0.2.166",
+		"@data-slot/select": "^0.2.166",
+		"@data-slot/slider": "^0.2.166",
+		"@data-slot/tabs": "^0.2.166",
+		"@data-slot/tooltip": "^0.2.166",
+		"@fontsource-variable/geist": "^5.2.9",
+		"@lucide/astro": "^1.20.0",
+		"@tailwindcss/vite": "^4.3.1",
+		"@types/node": "^26.0.0",
+		"astro": "^6.4.6",
+		"class-variance-authority": "^0.7.1",
+		"clsx": "^2.1.1",
+		"lucide-static": "^1.18.0",
+		"quill": "^2.0.3",
+		"simple-icons": "^16.23.0",
+		"tailwind-merge": "^3.6.0",
+		"tailwindcss": "^4.3.1",
+		"zod": "^4.4.3"
+	},
+	"devDependencies": {
+		"@astrojs/check": "^0.9.9",
+		"shadcn": "^4.13.0",
+		"typescript": "^6.0.3",
+		"vitest": "^4.1.9",
+		"wrangler": "^4.110.0"
+	}
+}

@@ -1,0 +1,25 @@
+---
+import type { HTMLAttributes } from "astro/types"
+
+type Props = HTMLAttributes<"div"> & {
+  /**
+   * Lock page scroll while open (library default: true). Set false when the page's scroll
+   * container isn't <body> (e.g. a layout with `overflow-y-auto` on <main>), where the
+   * library's scrollbar-width compensation pads <body> for a scrollbar it doesn't own and
+   * shifts the page sideways.
+   */
+  lockScroll?: boolean
+}
+
+const { class: className, lockScroll, ...props } = Astro.props
+---
+
+<div data-slot="dialog" data-lock-scroll={lockScroll} class={className} {...props}>
+  <slot />
+</div>
+
+<script>
+  import { create } from "@data-slot/dialog"
+
+  create()
+</script>

@@ -1,0 +1,48 @@
+---
+interface Props {
+  id?: string;
+  sitekey?: string;
+  action?: string;
+  appearance?: 'always' | 'execute' | 'interaction-only';
+  size?: 'normal' | 'flexible' | 'compact';
+  class?: string;
+}
+
+import { resolveTurnstileSiteKey } from '@/lib/turnstile-sitekey';
+
+let workerSitekey: string | undefined;
+// import.meta.env.DEV covers `astro dev`; the DEV_BYPASS binding covers `wrangler dev` (a prod-mode
+// build where import.meta.env.DEV is false). Both are guaranteed off in staging/production.
+let devBypass = import.meta.env.DEV;
+try {
+  const { env: workerEnv } = await import('cloudflare:workers');
+  workerSitekey = workerEnv.turnstile_site_key;
+  if (workerEnv.DEV_BYPASS === '1') devBypass = true;
+} catch {
+  // astro dev mode: cloudflare:workers not available
+}
+
+const {
+  id,
+  // Runtime binding wins over the build-time value; pages should not pass `sitekey`.
+  sitekey = resolveTurnstileSiteKey(workerSitekey, import.meta.env.turnstile_site_key),
+  action = 'turnstile-spin-v1',
+  appearance = 'interaction-only',
+  size = 'normal',
+  class: className,
+} = Astro.props;
+---
+
+<turnstile-widget
+  id={id}
+  data-sitekey={sitekey}
+  data-action={action}
+  data-appearance={appearance}
+  data-size={size}
+  data-dev-bypass={devBypass ? '1' : undefined}
+  class={className}
+></turnstile-widget>
+
+<script>
+  import '@/lib/turnstile';
+</script>

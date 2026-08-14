@@ -1,0 +1,79 @@
+---
+import type { HTMLAttributes } from "astro/types"
+
+import ArrowLeft from 'lucide-static/icons/arrow-left.svg'
+import ArrowRight from 'lucide-static/icons/arrow-right.svg'
+import BuildingTwo from 'lucide-static/icons/building-2.svg'
+import Calendar from 'lucide-static/icons/calendar.svg'
+import Check from 'lucide-static/icons/check.svg'
+import Circle from 'lucide-static/icons/circle.svg'
+import CreditCard from 'lucide-static/icons/credit-card.svg'
+import ChevronDown from 'lucide-static/icons/chevron-down.svg'
+import ChevronLeft from 'lucide-static/icons/chevron-left.svg'
+import ChevronUp from 'lucide-static/icons/chevron-up.svg'
+import CircleDollarSign from 'lucide-static/icons/circle-dollar-sign.svg'
+import History from 'lucide-static/icons/history.svg'
+import SquarePen from 'lucide-static/icons/square-pen.svg'
+import CircleGauge from 'lucide-static/icons/circle-gauge.svg'
+import Clock from 'lucide-static/icons/clock.svg'
+import LoaderCircle from 'lucide-static/icons/loader-circle.svg'
+import LogOut from 'lucide-static/icons/log-out.svg'
+import Menu from 'lucide-static/icons/menu.svg'
+import MessageSquare from 'lucide-static/icons/message-square.svg'
+import PiggyBank from 'lucide-static/icons/piggy-bank.svg'
+import Repeat from 'lucide-static/icons/repeat.svg'
+import Settings from 'lucide-static/icons/settings.svg'
+import Star from 'lucide-static/icons/star.svg'
+import ThumbsUp from 'lucide-static/icons/thumbs-up.svg'
+import Trash from 'lucide-static/icons/trash-2.svg'
+import ExternalLink from 'lucide-static/icons/external-link.svg'
+import Upload from 'lucide-static/icons/upload.svg'
+import X from 'lucide-static/icons/x.svg'
+import Banknote from 'lucide-static/icons/banknote.svg'
+import Info from 'lucide-static/icons/info.svg'
+import ShieldCheck from 'lucide-static/icons/shield-check.svg'
+
+type Props = Omit<HTMLAttributes<"svg">, "name"> & {
+  name?: string | number | null
+}
+
+const { name, ...props } = Astro.props
+
+const iconMap: Record<string, any> = {
+  'arrow-left': ArrowLeft,
+  'arrow-right': ArrowRight,
+  'building-2': BuildingTwo,
+  'calendar': Calendar,
+  'check': Check,
+  'circle': Circle,
+  'credit-card': CreditCard,
+  'chevron-down': ChevronDown,
+  'chevron-left': ChevronLeft,
+  'chevron-up': ChevronUp,
+  'circle-dollar-sign': CircleDollarSign,
+  'history': History,
+  'square-pen': SquarePen,
+  'circle-gauge': CircleGauge,
+  'clock': Clock,
+  'loader-circle': LoaderCircle,
+  'log-out': LogOut,
+  'menu': Menu,
+  'message-square': MessageSquare,
+  'piggy-bank': PiggyBank,
+  'repeat': Repeat,
+  'settings': Settings,
+  'star': Star,
+  'thumbs-up': ThumbsUp,
+  'trash': Trash,
+  'external-link': ExternalLink,
+  'upload': Upload,
+  'x': X,
+  'banknote': Banknote,
+  'info': Info,
+  'shield-check': ShieldCheck,
+}
+
+const Comp = name ? iconMap[String(name)] : undefined
+---
+
+{Comp && <Comp height={24} width={24} class="size-[1em] text-base" {...props} />}

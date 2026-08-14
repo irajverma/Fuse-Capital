@@ -1,0 +1,82 @@
+---
+import { cn } from "@/lib/utils"
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion"
+import { Section, SectionContainer } from "@/components/ui/section"
+
+type Props = {
+  class?: string
+  title: string
+  faqs: {
+    id: string
+    question: string
+    answer: string
+  }[]
+}
+
+const { class: className, title, faqs } = Astro.props
+
+const half = Math.ceil(faqs.length / 2)
+const leftFaqs = faqs.slice(0, half)
+const rightFaqs = faqs.slice(half)
+---
+
+<Section class={cn("", className)}>
+  <SectionContainer class="items-center">
+    <div class="mx-auto w-full">
+      <h2
+        class="text-foreground text-3xl font-semibold tracking-tight text-balance sm:text-4xl"
+      >
+        {title}
+      </h2>
+      <div data-faq-grid class="mt-10 grid min-h-125 grid-cols-1 gap-x-6 md:grid-cols-2 [&_a]:underline [&_a]:underline-offset-2">
+        <Accordion collapsible class="border-b md:border-b-0">
+          {
+            leftFaqs.map((item) => (
+              <AccordionItem value={item.id}>
+                <AccordionTrigger>{item.question}</AccordionTrigger>
+                <AccordionContent set:html={item.answer} />
+              </AccordionItem>
+            ))
+          }
+        </Accordion>
+        <Accordion collapsible>
+          {
+            rightFaqs.map((item) => (
+              <AccordionItem value={item.id}>
+                <AccordionTrigger>{item.question}</AccordionTrigger>
+                <AccordionContent set:html={item.answer} />
+              </AccordionItem>
+            ))
+          }
+        </Accordion>
+      </div>
+    </div>
+  </SectionContainer>
+</Section>
+
+<script>
+  for (const grid of document.querySelectorAll<HTMLElement>("[data-faq-grid]")) {
+    const accordions = grid.querySelectorAll<HTMLElement>('[data-slot="accordion"]')
+    const [left, right] = accordions
+    if (!left || !right) continue
+
+    const isMobile = () => window.innerWidth < 768
+
+    left.addEventListener("accordion:change", (e) => {
+      if (isMobile() && (e as CustomEvent).detail?.value?.length > 0) {
+        right.dispatchEvent(new CustomEvent("accordion:set", { detail: { value: [] } }))
+      }
+    })
+
+    right.addEventListener("accordion:change", (e) => {
+      if (isMobile() && (e as CustomEvent).detail?.value?.length > 0) {
+        left.dispatchEvent(new CustomEvent("accordion:set", { detail: { value: [] } }))
+      }
+    })
+  }
+</script>

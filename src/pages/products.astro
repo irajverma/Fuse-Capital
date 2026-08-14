@@ -1,0 +1,77 @@
+---
+export const prerender = true;
+
+import Layout from '../layouts/Layout.astro';
+import QuillEditor from '../components/QuillEditor.astro';
+import InquiryForm from '../components/InquiryForm.astro';
+import ProductCard from '../components/ProductCard.astro';
+import { fundingProducts } from '../data/funding-products';
+import ProductRequirements from '@/components/ProductRequirements.astro';
+
+const inquiryPrompt = "Have questions? We'll work with you one-on-one, no commitment required.";
+
+const tableRows = [
+  { label: "Amount",      key: "amount"      },
+  { label: "Time to Fund", key: "timeToFund" },
+  { label: "Term Length", key: "termLength"  },
+  { label: "Repayment",   key: "repayment"   },
+  { label: "Rate / Cost", key: "rateCost"    },
+] as const;
+
+const minRequirements = {
+  requirements: {
+    creditScore:    "450",
+    monthlyRevenue: "$5k+",
+    timeInBusiness: "6+ months",
+  },
+};
+---
+
+<Layout title="Products | Funded Experts" description="Explore all financing options available through Funded Experts.">
+  <main class="max-w-6xl mx-auto px-6 py-20">
+    <div>
+      <h1 class="text-4xl font-bold tracking-tight text-foreground mb-4">All Products</h1>
+
+      <QuillEditor placeholder={inquiryPrompt} class="my-10">
+        <InquiryForm slot="actions" context="product-match" prompt={inquiryPrompt} />
+      </QuillEditor>
+
+      <div class="hidden sm:block mt-20 overflow-x-auto">
+        <table class="w-full border-collapse text-sm">
+          <thead>
+            <tr>
+              <th class="text-left pr-3 py-2 md:py-3 lg:py-6 whitespace-nowrap"></th>
+              {fundingProducts.map((p) => (
+                <th class="text-left pr-3 py-2 md:py-3 lg:py-6 border-b border-border">
+                  <span class="block text-xs font-medium text-muted-foreground uppercase tracking-widest">{p.category}</span>
+                  <span class="text-base text-foreground">{p.title}</span>
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {tableRows.map(({ label, key }) => (
+              <tr class="border-t border-border">
+                <td class="pr-3 py-2 md:py-3 lg:py-6 text-xs font-semibold uppercase tracking-widest text-muted-foreground whitespace-nowrap">{label}</td>
+                {fundingProducts.map((p) => (
+                  <td class="pr-3 py-2 md:py-3 lg:py-6 text-foreground">{p[key]}</td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="mt-10 sm:mt-20 flex flex-col gap-4">
+      {fundingProducts.map((product, i) => (
+        <ProductCard index={i + 1} {...product} />
+      ))}
+    </div>
+
+    <div class="mt-20">
+      <ProductRequirements product={minRequirements} />
+    </div>
+
+  </main>
+</Layout>

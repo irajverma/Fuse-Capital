@@ -1,0 +1,379 @@
+---
+import '../styles/global.css';import {
+  NavigationMenu,
+  NavigationMenuItem,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+} from "@/components/ui/navigation-menu"
+import NavCard from "@/components/NavCard.astro"
+import { Icon } from "@/components/ui/icon"
+import { Logo, LogoImage } from "@/components/ui/logo"
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+} from "@/components/ui/sheet"
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion"
+import { Separator } from "@/components/ui/separator"
+import Footer3Block from "@/components/blocks/footer-3.astro"
+import ThemeToggle from "@/components/ThemeToggle.astro"
+import ThemeInit from "@/components/ThemeInit.astro"
+import { nav } from "@/data/nav"
+
+type Props = {
+	title?: string;
+	description?: string;
+	/** When true, the topbar is hidden at the top of the page and slides in after a small scroll. */
+	revealNavOnScroll?: boolean;
+	/** When true, the native scrollbar is hidden and replaced by a custom fade-in overlay thumb. */
+	overlayScrollbar?: boolean;
+}
+const { title = 'Funded Experts', description, revealNavOnScroll = false, overlayScrollbar = false } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en" class:list={["m-0 w-full h-full", overlayScrollbar && "overlay-scrollbar"]}>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="generator" content={Astro.generator} />
+		<title>{title === 'Funded Experts' ? title : `${title} | Funded Experts`}</title>
+		{description && <meta name="description" content={description} />}
+		<ThemeInit />
+	</head>
+	<body class="m-0 w-full h-full bg-background text-foreground">
+		{overlayScrollbar && (
+			<div data-page-scrollbar class="fixed top-0 right-0 z-[60] hidden h-screen w-3 pointer-events-none">
+				<div
+					data-page-scrollbar-thumb
+					class="absolute top-0 right-1 w-1.5 rounded-full bg-ring opacity-0 transition-opacity duration-300 pointer-events-auto cursor-grab"
+				></div>
+			</div>
+		)}
+		<div
+			class:list={[
+				"overflow-visible",
+				revealNavOnScroll &&
+					"fixed top-0 left-0 right-0 z-50 -translate-y-full transition-transform duration-300 ease-out will-change-transform",
+			]}
+			data-nav-bar
+			data-reveal-on-scroll={revealNavOnScroll ? "true" : undefined}
+		>
+		<NavigationMenu class="border-b border-border bg-background">
+			<div class="absolute inset-y-0 my-auto right-2 flex items-center md:hidden">
+				<Sheet data-nav-sheet>
+					<SheetTrigger variant="ghost" size="icon" class="cursor-pointer">
+						<Icon name="menu" />
+					</SheetTrigger>
+					<SheetContent side="right" class="px-4 overflow-y-auto">
+					<div class="mt-10 w-full">
+					<a
+						href="/"
+						class="focus-visible:border-ring focus-visible:ring-ring/50 relative flex w-full items-center gap-4 rounded-md border border-transparent bg-transparent py-4 text-left text-sm font-medium transition-all outline-none hover:underline focus-visible:ring-3"
+					>Home</a>
+					<Separator />
+					<Accordion class="w-full">
+						{nav.map((section) => (
+							<AccordionItem value={section.title}>
+								<AccordionTrigger>{section.title}</AccordionTrigger>
+								<AccordionContent>
+									<ul class="flex flex-col gap-1">
+										{section.items.map((item) => (
+											<li>
+												<NavCard href={item.href} title={item.title} description={item.description} />
+											</li>
+										))}
+									</ul>
+								</AccordionContent>
+							</AccordionItem>
+						))}
+					</Accordion>
+					</div>
+				</SheetContent>
+				</Sheet>
+			</div>
+			<Logo href="/" class="absolute top-1/2 -translate-y-1/2 left-4 hidden md:flex lg:hidden">
+				<LogoImage srcLight="/logo-regular.svg" srcDark="/logo-darkmode.svg" alt="Logo" />
+			</Logo>
+			<Logo href="/" class="absolute top-1/2 -translate-y-1/2 left-4 hidden lg:flex">
+				<LogoImage srcLight="/full-logo.svg" srcDark="/full-logo-white.svg" alt="Funded Experts" />
+			</Logo>
+			<NavigationMenuList class="flex-wrap">
+				{nav.map((section, i) => (
+					<NavigationMenuItem value={section.title} class="hidden md:block" data-nav-index={String(i)}>
+						<NavigationMenuTrigger>{section.title}</NavigationMenuTrigger>
+					</NavigationMenuItem>
+				))}
+			</NavigationMenuList>
+
+			<!-- Single shared dropdown: JS swaps content so panels can never overlap -->
+			<div
+				data-nav-dropdown
+				class="absolute left-0 top-full z-50 w-full border-t border-border bg-background text-foreground shadow-md opacity-0 pointer-events-none transition-opacity duration-150"
+			>
+				{nav.map((section, i) => (
+					<div data-nav-section={String(i)} class={i > 0 ? "hidden" : ""}>
+						<div class="max-w-250 my-5 px-5 mx-auto">
+							<ul class="grid w-full gap-4 grid-cols-3">
+								{section.items.map((item) => (
+									<li>
+										<NavCard href={item.href} title={item.title} description={item.description} />
+									</li>
+								))}
+							</ul>
+						</div>
+					</div>
+				))}
+			</div>
+			<div class="absolute inset-y-0 left-4 md:left-auto md:right-4 flex items-center gap-2">
+				<ThemeToggle />
+			</div>
+		</NavigationMenu>
+		</div>
+		<slot />
+		<Footer3Block
+		    class="py-6 px-2 mt-10 border-t border-border"
+			columns={nav.map((section) => ({
+				title: section.title,
+				links: section.items.map((item) => ({ label: item.title, href: item.href })),
+			}))}
+			copyright="© 2026 Funded Experts"
+			bottomLinks={[
+				{ label: "Privacy", href: "/privacy" },
+				{ label: "Terms", href: "/terms" },
+			]}
+		/>
+
+
+
+		<script>
+			// Reveal topbar on scroll (hidden at the very top, slides in past a threshold) OR
+			// when the pointer hovers near the top of the viewport. Re-hides when the pointer
+			// moves away while still scrolled to the top.
+			;(() => {
+				const bar = document.querySelector<HTMLElement>('[data-nav-bar][data-reveal-on-scroll]')
+				if (!bar) return
+
+				// Returning visitors who've used the topbar get it pinned: CSS already keeps it
+				// visible pre-paint (html[data-nav-engaged]); strip the hidden class and skip the
+				// scroll/hover reveal machinery entirely.
+				if (document.documentElement.dataset.navEngaged) {
+					bar.classList.remove('-translate-y-full')
+					return
+				}
+
+				// The nav dropdown extends below the bar; keep the bar revealed while it's open
+				// so hovering the dropdown doesn't retract the bar out from under it.
+				const dropdown = document.querySelector<HTMLElement>('[data-nav-dropdown]')
+				const dropdownOpen = () => !!dropdown && dropdown.classList.contains('pointer-events-auto')
+
+				const threshold = 64
+				const revealZone = 80
+				let scrolled = false
+				let hovering = false
+
+				const apply = () => {
+					bar.classList.toggle('-translate-y-full', !(scrolled || hovering || dropdownOpen()))
+				}
+				const onScroll = () => {
+					scrolled = window.scrollY > threshold
+					apply()
+				}
+				const onMove = (e: MouseEvent) => {
+					// Hysteresis: open within revealZone of the top, close once the pointer
+					// drops below the (already revealed) bar's height.
+					hovering = e.clientY <= (hovering ? bar.offsetHeight : revealZone)
+					apply()
+				}
+
+				onScroll()
+				window.addEventListener('scroll', onScroll, { passive: true })
+				window.addEventListener('mousemove', onMove, { passive: true })
+			})()
+		</script>
+
+		<script>
+			// First interaction with the topbar "graduates" a visitor from new -> returning:
+			// persist a flag so the reveal-on-scroll nav is pinned from first paint on every
+			// future visit (applied pre-paint by ThemeInit; pinned by the html[data-nav-engaged]
+			// rule in global.css). Any click within the bar counts; reaching for the toolbar at
+			// all is the signal that the visitor wants it within easy reach. Runs on every page
+			// (not just reveal pages) so engagement on an always-visible nav still counts toward
+			// the homepage's pinned state.
+			;(() => {
+				const bar = document.querySelector<HTMLElement>('[data-nav-bar]')
+				if (!bar || document.documentElement.dataset.navEngaged) return
+				bar.addEventListener('click', () => {
+					try { localStorage.setItem('navEngaged', '1') } catch {}
+					document.documentElement.dataset.navEngaged = '1'
+				}, { once: true, capture: true })
+			})()
+		</script>
+
+		<script>
+			// Custom overlay scrollbar: native bar is hidden via CSS; this draws a fixed thumb
+			// that fades in while scrolling, fades out after idle, and is draggable.
+			;(() => {
+				const track = document.querySelector<HTMLElement>('[data-page-scrollbar]')
+				const thumb = document.querySelector<HTMLElement>('[data-page-scrollbar-thumb]')
+				if (!track || !thumb) return
+
+				const MIN_THUMB = 28
+				const docEl = document.documentElement
+				let hideTimer: ReturnType<typeof setTimeout> | null = null
+				let dragging = false
+
+				const range = () => {
+					const vh = window.innerHeight
+					const max = docEl.scrollHeight - vh
+					return { vh, max }
+				}
+
+				const layout = () => {
+					const { vh, max } = range()
+					if (max <= 0) { track.classList.add('hidden'); return }
+					track.classList.remove('hidden')
+					const h = Math.max(MIN_THUMB, (vh / docEl.scrollHeight) * vh)
+					const top = (window.scrollY / max) * (vh - h)
+					thumb.style.height = `${h}px`
+					thumb.style.transform = `translateY(${top}px)`
+				}
+
+				const show = () => {
+					if (hideTimer) { clearTimeout(hideTimer); hideTimer = null }
+					thumb.classList.remove('opacity-0')
+				}
+				const scheduleHide = () => {
+					if (hideTimer) clearTimeout(hideTimer)
+					hideTimer = setTimeout(() => {
+						if (!dragging) thumb.classList.add('opacity-0')
+					}, 1000)
+				}
+
+				// layout() reads scrollHeight (a layout-flushing read) and writes the thumb
+				// style; running it raw on every scroll event thrashes layout. rAF-batch so it
+				// runs at most once per frame. show()/scheduleHide() are cheap class/timer ops.
+				let ticking = false
+				window.addEventListener('scroll', () => {
+					show(); scheduleHide()
+					if (ticking) return
+					ticking = true
+					requestAnimationFrame(() => { layout(); ticking = false })
+				}, { passive: true })
+				window.addEventListener('resize', layout)
+				thumb.addEventListener('pointerenter', show)
+				thumb.addEventListener('pointerleave', scheduleHide)
+
+				thumb.addEventListener('pointerdown', (e) => {
+					e.preventDefault()
+					dragging = true
+					thumb.classList.add('cursor-grabbing')
+					thumb.setPointerCapture(e.pointerId)
+					const startY = e.clientY
+					const startScroll = window.scrollY
+					const { vh, max } = range()
+					const travel = vh - thumb.getBoundingClientRect().height
+
+					const move = (ev: PointerEvent) => {
+						const ratio = travel > 0 ? (ev.clientY - startY) / travel : 0
+						window.scrollTo({ top: startScroll + ratio * max })
+					}
+					const up = () => {
+						dragging = false
+						thumb.classList.remove('cursor-grabbing')
+						thumb.releasePointerCapture(e.pointerId)
+						window.removeEventListener('pointermove', move)
+						window.removeEventListener('pointerup', up)
+						scheduleHide()
+					}
+					window.addEventListener('pointermove', move)
+					window.addEventListener('pointerup', up)
+				})
+
+				layout()
+			})()
+		</script>
+
+		<script>
+			// Mobile sheet: close on resize to desktop, reopen on resize back to mobile
+			const mq = window.matchMedia('(min-width: 768px)')
+			let forceClosedByResize = false
+
+			mq.addEventListener('change', () => {
+				const sheet = document.querySelector('[data-nav-sheet][data-slot="dialog"]')
+				if (!sheet) return
+
+				if (mq.matches) {
+					forceClosedByResize = sheet.hasAttribute('data-open')
+					if (forceClosedByResize) {
+						sheet.dispatchEvent(new CustomEvent('dialog:set', { detail: { open: false } }))
+					}
+				} else {
+					if (forceClosedByResize) {
+						forceClosedByResize = false
+						sheet.dispatchEvent(new CustomEvent('dialog:set', { detail: { open: true } }))
+					}
+				}
+			})
+
+			// Desktop dropdown: single shared panel, content swaps instantly on trigger hover.
+			// One panel = no overlap possible. 80ms grace timer prevents flicker in the gap between triggers.
+			;(() => {
+				const navEl = document.querySelector<HTMLElement>('[data-slot="navigation-menu"]')
+				if (!navEl) return
+
+				const triggers = Array.from(navEl.querySelectorAll<HTMLElement>('[data-nav-index]'))
+				const panel = navEl.querySelector<HTMLElement>('[data-nav-dropdown]')
+				if (!panel) return
+
+				const sections = Array.from(panel.querySelectorAll<HTMLElement>('[data-nav-section]'))
+				let hideTimer: ReturnType<typeof setTimeout> | null = null
+
+				function setActiveState(activeIndex: number | null) {
+					triggers.forEach((t, i) => {
+						const btn = t.querySelector<HTMLElement>('[data-slot="navigation-menu-trigger"]')
+						const isActive = i === activeIndex
+						t.querySelector('svg')?.classList.toggle('rotate-180', isActive)
+						if (btn) btn.dataset.active = isActive ? 'true' : 'false'
+					})
+				}
+
+				function showSection(index: number) {
+					if (hideTimer !== null) { clearTimeout(hideTimer); hideTimer = null }
+					sections.forEach((s, i) => s.classList.toggle('hidden', i !== index))
+					panel!.classList.remove('opacity-0', 'pointer-events-none')
+					panel!.classList.add('opacity-100', 'pointer-events-auto')
+					setActiveState(index)
+				}
+
+				function scheduleHide() {
+					if (hideTimer !== null) return
+					hideTimer = setTimeout(() => {
+						hideTimer = null
+						panel!.classList.remove('opacity-100', 'pointer-events-auto')
+						panel!.classList.add('opacity-0', 'pointer-events-none')
+						setActiveState(null)
+					}, 80)
+				}
+
+				triggers.forEach(trigger => {
+					const index = parseInt(trigger.dataset.navIndex!, 10)
+					trigger.addEventListener('mouseenter', () => showSection(index))
+					trigger.addEventListener('mouseleave', scheduleHide)
+				})
+
+				panel.addEventListener('mouseenter', () => {
+					if (hideTimer !== null) { clearTimeout(hideTimer); hideTimer = null }
+				})
+				panel.addEventListener('mouseleave', scheduleHide)
+			})()
+		</script>
+	</body>
+</html>
+

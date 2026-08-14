@@ -1,0 +1,200 @@
+---
+// Bare application form: the funnel entry the marketing CTAs point at.
+//
+// Validate-only: posts to /api/apply, which verifies Turnstile, rate-limits and validates the
+// payload, then discards it. The real application flow lives elsewhere; keep the request/response
+// contract stable.
+//
+// The homepage capital dropdown (and the partnerships page's Business-owner hand-off) seed the
+// `mc_onboarding_draft` localStorage key before navigating here; the script below prefills from it.
+export const prerender = true
+
+import Layout from '@/layouts/Layout.astro'
+import TurnstileWidget from '@/components/Turnstile.astro'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupText } from '@/components/ui/input-group'
+import { Label } from '@/components/ui/label'
+import { Field } from '@/components/ui/field'
+import { industryNames } from '@/data/industries'
+import { fundingAmounts } from '@/data/funding'
+---
+
+<Layout
+  title="Apply"
+  description="Apply for business funding with Funded Experts."
+>
+  <main class="max-w-lg mx-auto px-6 py-16 sm:py-24">
+    <div id="ap-form" class="flex flex-col gap-4">
+      <h1 class="text-xl font-semibold tracking-tight">Check your eligibility</h1>
+
+      <Field>
+        <Label for="ap-business-name">Business name</Label>
+        <Input id="ap-business-name" type="text" placeholder="Acme LLC" autocomplete="organization" maxlength="200" />
+      </Field>
+
+      <Field>
+        <Label for="ap-industry">Industry</Label>
+        <select id="ap-industry"
+          class="border-input h-9 w-full rounded-md border bg-transparent px-3 py-1 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]">
+          <option value="" selected disabled>Select your industry</option>
+          {industryNames.map((name) => (
+            <option value={name}>{name}</option>
+          ))}
+        </select>
+      </Field>
+
+      <div class="grid grid-cols-2 gap-3">
+        <Field>
+          <Label for="ap-first-name">First name</Label>
+          <Input id="ap-first-name" type="text" placeholder="Jane" autocomplete="given-name" maxlength="100" />
+        </Field>
+        <Field>
+          <Label for="ap-last-name">Last name</Label>
+          <Input id="ap-last-name" type="text" placeholder="Smith" autocomplete="family-name" maxlength="100" />
+        </Field>
+      </div>
+
+      <Field>
+        <Label for="ap-email">Email</Label>
+        <Input id="ap-email" type="email" placeholder="you@yourbusiness.com" autocomplete="email" maxlength="254" />
+      </Field>
+
+      <Field>
+        <Label for="ap-phone">Phone number</Label>
+        {/* "+1" is an addon, the field holds the 10 national digits formatted as (XXX) XXX-XXXX. */}
+        <InputGroup class="w-full">
+          <InputGroupAddon align="inline-start">
+            <InputGroupText>+1</InputGroupText>
+          </InputGroupAddon>
+          <InputGroupInput id="ap-phone" type="tel" inputmode="numeric" maxlength="14"
+            placeholder="(555) 000-0000" autocomplete="tel-national" />
+        </InputGroup>
+      </Field>
+
+      <Field>
+        <Label for="ap-amount">How much capital do you need?</Label>
+        <select id="ap-amount"
+          class="border-input h-9 w-full rounded-md border bg-transparent px-3 py-1 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]">
+          <option value="" selected disabled>Select an amount</option>
+          {fundingAmounts.map((f) => (
+            <option value={f.value}>{f.label}</option>
+          ))}
+        </select>
+      </Field>
+
+      {/* Invisible unless the challenge needs a human: appearance defaults to 'interaction-only',
+          and gateOnTurnstile remounts it visibly only if it hasn't resolved in 5s. */}
+      <TurnstileWidget id="ap-turnstile" action="apply" size="flexible" class="w-full" />
+      <p id="ap-check-status" class="text-xs text-center text-muted-foreground">Checking security…</p>
+      <Button id="ap-submit" class="w-full" disabled>Check eligibility</Button>
+      <p id="ap-error" role="alert" class="text-destructive text-sm font-normal" hidden></p>
+    </div>
+
+    <div id="ap-success" hidden class="flex flex-col gap-3">
+      <h1 class="text-xl font-semibold tracking-tight">Thanks, we have your details</h1>
+      <p>Our team will review your information and reach out with next steps.</p>
+    </div>
+  </main>
+</Layout>
+
+<script>
+  import { preloadTurnstile, gateOnTurnstile, takeTurnstileToken } from '@/lib/turnstile'
+  import type { TurnstileWidget } from '@/lib/turnstile'
+  import { formatUsPhone, isValidUsPhone, nationalUsDigits } from '@/lib/apply/phone'
+
+  const $ = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as T
+  // The workerd runtime types declare their own Element (for HTMLRewriter), which collides with
+  // the DOM lib's HTMLSelectElement under the helper's constraint; cast through unknown instead.
+  const sel = (id: string) => document.getElementById(id) as unknown as HTMLSelectElement
+
+  const form = $('ap-form')
+  const btn = $<HTMLButtonElement>('ap-submit')
+  const widget = $<TurnstileWidget>('ap-turnstile')
+  const statusEl = $('ap-check-status')
+  const errEl = $('ap-error')
+
+  preloadTurnstile()
+  gateOnTurnstile({ widget, button: btn, status: statusEl })
+
+  // Prefill from the onboarding draft seeded by the homepage capital dropdown (fundingAmount) and
+  // the partnerships page's Business-owner hand-off (firstName/lastName).
+  try {
+    const draft = JSON.parse(localStorage.getItem('mc_onboarding_draft') ?? '{}')
+    if (typeof draft.fundingAmount === 'string') sel('ap-amount').value = draft.fundingAmount
+    if (typeof draft.firstName === 'string') $<HTMLInputElement>('ap-first-name').value = draft.firstName
+    if (typeof draft.lastName === 'string') $<HTMLInputElement>('ap-last-name').value = draft.lastName
+  } catch {}
+
+  const phoneInput = $<HTMLInputElement>('ap-phone')
+  phoneInput.addEventListener('input', () => {
+    phoneInput.value = formatUsPhone(phoneInput.value)
+  })
+
+  const fail = (msg: string) => {
+    errEl.textContent = msg
+    errEl.hidden = false
+  }
+
+  btn.addEventListener('click', async () => {
+    const businessName = $<HTMLInputElement>('ap-business-name').value.trim()
+    const industry = sel('ap-industry').value
+    const firstName = $<HTMLInputElement>('ap-first-name').value.trim()
+    const lastName = $<HTMLInputElement>('ap-last-name').value.trim()
+    const email = $<HTMLInputElement>('ap-email').value.trim()
+    const fundingAmount = sel('ap-amount').value
+
+    if (!businessName || !industry || !firstName || !lastName || !email || !phoneInput.value || !fundingAmount) {
+      fail('Please fill in all fields.')
+      return
+    }
+    if (!isValidUsPhone(phoneInput.value)) {
+      fail('Please enter a valid 10-digit US phone number.')
+      return
+    }
+
+    const token = takeTurnstileToken(widget)
+    if (!token) {
+      fail('Security check not ready. Please wait a moment and try again.')
+      return
+    }
+
+    errEl.hidden = true
+    btn.setAttribute('disabled', '')
+
+    let res: Response
+    try {
+      res = await fetch('/api/apply', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          businessName,
+          industry,
+          firstName,
+          lastName,
+          email,
+          phone: nationalUsDigits(phoneInput.value),
+          fundingAmount,
+          token,
+        }),
+      })
+    } catch {
+      btn.removeAttribute('disabled')
+      widget.reset()
+      fail('Network error. Please try again.')
+      return
+    }
+
+    const data = await res.json().catch(() => ({})) as { success?: boolean; error?: string }
+    if (!res.ok || !data.success) {
+      btn.removeAttribute('disabled')
+      // Every token is single-use, so a retry needs a fresh one.
+      widget.reset()
+      fail(data.error ?? 'Something went wrong. Please try again.')
+      return
+    }
+
+    form.hidden = true
+    $('ap-success').hidden = false
+  })
+</script>

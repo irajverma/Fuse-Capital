@@ -1,0 +1,304 @@
+---
+// Public partner interest form, linked from the Resources nav (src/data/nav.ts).
+//
+// One form, two outcomes, decided by the Role dropdown: Broker / ISO and VC both post here, while
+// Business owner leaves immediately for /apply, carrying whatever name has been typed so far.
+//
+// Validate-only: the form posts to /api/partnerships, which verifies Turnstile, rate-limits and
+// validates the payload, then discards it. The real intake lives elsewhere; keep the
+// request/response contract stable.
+//
+// Deliberately form-only: no hero, no pitch copy. The page is the form, nothing else.
+export const prerender = true
+
+import Layout from '@/layouts/Layout.astro'
+import TurnstileWidget from '@/components/Turnstile.astro'
+import QuillEditor from '@/components/QuillEditor.astro'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupText } from '@/components/ui/input-group'
+import { Label } from '@/components/ui/label'
+import { Field } from '@/components/ui/field'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+
+// Placeholder shown inside the VC message editor.
+const vcPrompt = "Tell us about your fund and what you're looking for."
+---
+
+{/* Layout appends " | Funded Experts" itself, so the title is the bare page name (the convention
+    src/pages/blog.astro follows). Several marketing pages pass the suffix too and render it twice. */}
+<Layout
+  title="Partnerships"
+  description="Partner with Funded Experts: brokers, ISOs and VCs."
+>
+  <main class="max-w-lg mx-auto px-6 py-16 sm:py-24">
+    <div id="pt-form" class="flex flex-col gap-4">
+      <h1 class="text-xl font-semibold tracking-tight">Become a partner</h1>
+
+      <div class="grid grid-cols-2 gap-3">
+        <Field>
+          <Label for="pt-first-name">First name</Label>
+          <Input id="pt-first-name" type="text" placeholder="Jane" autocomplete="given-name" maxlength="100" />
+        </Field>
+        <Field>
+          <Label for="pt-last-name">Last name</Label>
+          <Input id="pt-last-name" type="text" placeholder="Smith" autocomplete="family-name" maxlength="100" />
+        </Field>
+      </div>
+
+      {/* Role decides where this form goes. Broker/ISO and VC both submit here; Business owner
+          leaves immediately for /apply, carrying whatever name has been typed so far. */}
+      <div class="flex flex-col gap-1.5">
+        <label for="pt-role-trigger" class="text-sm font-medium leading-none">Role</label>
+        <Select id="pt-role" placeholder="Select your role" lockScroll={false} class="w-full gap-0">
+          <SelectTrigger id="pt-role-trigger" class="w-full">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent align="start" class="w-(--anchor-width)">
+            <SelectItem value="broker">Broker / ISO</SelectItem>
+            <SelectItem value="vc">VC</SelectItem>
+            <SelectItem value="owner">Business owner</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* VC only: an editable note posted with the form. It has no send button of its own; the
+          form's own submit is the send. */}
+      <div id="pt-vc-message" hidden class="flex flex-col gap-1.5">
+        <span class="text-sm font-medium leading-none">Message (optional)</span>
+        <QuillEditor placeholder={vcPrompt} toolbar="open" />
+      </div>
+
+      <Field>
+        <Label for="pt-email">Company email</Label>
+        <Input id="pt-email" type="email" placeholder="you@yourfirm.com" autocomplete="email" maxlength="254" />
+      </Field>
+
+      <Field>
+        <Label for="pt-phone">Phone number</Label>
+        {/* "+1" is an addon, the field holds the 10 national digits formatted as (XXX) XXX-XXXX. */}
+        <InputGroup class="w-full">
+          <InputGroupAddon align="inline-start">
+            <InputGroupText>+1</InputGroupText>
+          </InputGroupAddon>
+          <InputGroupInput id="pt-phone" type="tel" inputmode="numeric" maxlength="14"
+            placeholder="(555) 000-0000" autocomplete="tel-national" />
+        </InputGroup>
+      </Field>
+
+      {/* Invisible unless the challenge needs a human: appearance defaults to 'interaction-only',
+          and gateOnTurnstile remounts it visibly only if it hasn't resolved in 5s. */}
+      <TurnstileWidget id="pt-turnstile" action="partner-signup" size="flexible" class="w-full" />
+      <p id="pt-check-status" class="text-xs text-center text-muted-foreground">Checking security…</p>
+      {/* Label follows the role: a broker is asking to partner, a VC is sending us a message. */}
+      <Button id="pt-submit" class="w-full" disabled>Become a partner</Button>
+      <p id="pt-error" role="alert" class="text-destructive text-sm font-normal" hidden></p>
+
+    </div>
+
+    {/* Swapped in after a successful BROKER submit. */}
+    <div id="pt-success" hidden class="flex flex-col gap-3">
+      <h1 class="text-xl font-semibold tracking-tight">Thanks, we have your details</h1>
+      <p>Our team will review your information and be in touch.</p>
+    </div>
+
+    {/* And after a VC submit: the only thing that happened is the note reaching the team. */}
+    <div id="pt-success-vc" hidden class="flex flex-col gap-3">
+      <h1 class="text-xl font-semibold tracking-tight">Thanks, we have your details</h1>
+      <p class="text-sm text-muted-foreground">
+        Our team will reply to <span id="pt-success-vc-email" class="font-medium text-foreground"></span> directly.
+        There's nothing else to do, and no account to set up.
+      </p>
+      <p class="text-sm text-muted-foreground">
+        Looking for funding for your own business instead?
+        <a href="/apply" class="text-foreground underline">Start an application</a>.
+      </p>
+    </div>
+  </main>
+</Layout>
+
+<script>
+  import { preloadTurnstile, gateOnTurnstile, takeTurnstileToken } from '@/lib/turnstile'
+  import type { TurnstileWidget } from '@/lib/turnstile'
+  import { formatUsPhone, isValidUsPhone, nationalUsDigits } from '@/lib/apply/phone'
+
+  const $ = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as T
+
+  const form = $('pt-form')
+  const btn = $<HTMLButtonElement>('pt-submit')
+  const widget = $<TurnstileWidget>('pt-turnstile')
+  const statusEl = $('pt-check-status')
+  const errEl = $('pt-error')
+
+  preloadTurnstile()
+  gateOnTurnstile({ widget, button: btn, status: statusEl })
+
+  // What a VC may actually type, in plain characters, and the ceiling on the markup that carries
+  // it. The note is posted with the submit, so these are what keep a long note from ever being the
+  // reason the form fails. MESSAGE_MAX_HTML mirrors the endpoint's cap (duplicated rather than
+  // imported: pulling that module in would ship zod to the browser).
+  const MESSAGE_MAX_CHARS = 10_000
+  const MESSAGE_MAX_HTML = 40_000
+  // Both set once the editor is live. The plain-text reader judges emptiness; the HTML reader is
+  // what actually travels with the submit (the editor offers bold, lists and links).
+  let readVcMessage: (() => string) | null = null
+  let readVcMessageHtml: (() => string) | null = null
+
+  function watchVcMessage() {
+    // Queried here rather than through the `vcMessage` const below: this runs at module top level,
+    // before that declaration is initialized.
+    const editorEl = $('pt-vc-message').querySelector('[data-quill-editor]') as (HTMLElement & { quill?: { getText(): string; getSemanticHTML(): string } }) | null
+    if (!editorEl) return
+    const attach = (quill: { getText(): string; getSemanticHTML(): string }) => {
+      readVcMessage = () => quill.getText().replace(/\s+/g, ' ').trim()
+      readVcMessageHtml = () => quill.getSemanticHTML()
+    }
+    if (editorEl.quill) attach(editorEl.quill)
+    else editorEl.addEventListener('quill:ready', () => editorEl.quill && attach(editorEl.quill), { once: true })
+  }
+  watchVcMessage()
+
+  const phoneInput = $<HTMLInputElement>('pt-phone')
+  phoneInput.addEventListener('input', () => {
+    phoneInput.value = formatUsPhone(phoneInput.value)
+  })
+
+  const fail = (msg: string) => {
+    errEl.textContent = msg
+    errEl.hidden = false
+  }
+
+  // ── Role ────────────────────────────────────────────────────────────────────
+  // The dropdown picks between three different things, only two of which post here:
+  //
+  //   owner  never submits at all. A business owner wants funding, so the selection itself is the
+  //          submit and it hands off to /apply, seeding the onboarding draft with whatever name has
+  //          been typed (the write-then-navigate move the home page's capital dropdown makes).
+  //   vc     is a contact form. It reveals the message editor.
+  //   broker is the partner interest form this page was built for.
+  let role: 'broker' | 'vc' | '' = ''
+  const vcMessage = $('pt-vc-message')
+
+  $('pt-role').addEventListener('select:change', (e) => {
+    const value = (e as CustomEvent<{ value: string }>).detail?.value
+    if (!value) return
+
+    if (value === 'owner') {
+      const firstName = $<HTMLInputElement>('pt-first-name').value.trim()
+      const lastName = $<HTMLInputElement>('pt-last-name').value.trim()
+      // Only write what was actually filled in: an empty string would overwrite a name already in
+      // the draft from an earlier visit.
+      const draft: { firstName?: string; lastName?: string } = {}
+      if (firstName) draft.firstName = firstName
+      if (lastName) draft.lastName = lastName
+      if (draft.firstName || draft.lastName) {
+        try {
+          const cur = JSON.parse(localStorage.getItem('mc_onboarding_draft') ?? '{}')
+          localStorage.setItem('mc_onboarding_draft', JSON.stringify({ ...cur, ...draft }))
+        } catch {}
+      }
+      window.location.href = '/apply'
+      return
+    }
+
+    role = value === 'vc' ? 'vc' : 'broker'
+    const isVc = role === 'vc'
+    vcMessage.hidden = !isVc
+    // The button has to say what pressing it does: a VC is sending a message.
+    btn.textContent = isVc ? 'Send message' : 'Become a partner'
+    errEl.hidden = true
+  })
+
+  btn.addEventListener('click', async () => {
+    const firstName = $<HTMLInputElement>('pt-first-name').value.trim()
+    const lastName = $<HTMLInputElement>('pt-last-name').value.trim()
+    const email = $<HTMLInputElement>('pt-email').value.trim()
+
+    if (!role) {
+      fail('Please select your role.')
+      return
+    }
+    // The phone is optional for a VC (a lead we reply to by email, and many will not want to hand
+    // over a number to see what we do) and left unlabelled on purpose: the field looks exactly like
+    // the others, it simply is not enforced. Anything actually typed is still validated.
+    const isVc = role === 'vc'
+    if (!firstName || !lastName || !email || (!isVc && !phoneInput.value)) {
+      fail('Please fill in all fields.')
+      return
+    }
+    if (phoneInput.value && !isValidUsPhone(phoneInput.value)) {
+      fail('Please enter a valid 10-digit US phone number.')
+      return
+    }
+
+    // The VC note travels with this request; it has no send button of its own. Emptiness is judged
+    // on the plain text: an untouched Quill editor still serializes to markup ("<p><br></p>"),
+    // which is not a message.
+    const noteText = (isVc && readVcMessage?.()) || ''
+    const note = noteText ? readVcMessageHtml?.() ?? '' : ''
+    // Both caps are checked HERE, where the fix is obvious. Two of them, because the note is typed
+    // as text but travels as markup: one bounds what a person can reasonably write, the other
+    // mirrors the endpoint's own cap on what arrives.
+    if (noteText.length > MESSAGE_MAX_CHARS || note.length > MESSAGE_MAX_HTML) {
+      fail('Your message is too long. Please shorten it and try again.')
+      return
+    }
+
+    const token = takeTurnstileToken(widget)
+    if (!token) {
+      fail('Security check not ready. Please wait a moment and try again.')
+      return
+    }
+
+    errEl.hidden = true
+    btn.setAttribute('disabled', '')
+
+    let res: Response
+    try {
+      res = await fetch('/api/partnerships', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          firstName,
+          lastName,
+          role,
+          email,
+          phone: nationalUsDigits(phoneInput.value),
+          ...(note ? { message: note } : {}),
+          token,
+        }),
+      })
+    } catch {
+      btn.removeAttribute('disabled')
+      widget.reset()
+      fail('Network error. Please try again.')
+      return
+    }
+
+    const data = await res.json().catch(() => ({})) as { ok?: boolean; kind?: string; error?: string }
+    if (!res.ok || !data.ok) {
+      btn.removeAttribute('disabled')
+      // Every token is single-use, so a retry needs a fresh one.
+      widget.reset()
+      fail(data.error ?? 'Something went wrong. Please try again.')
+      return
+    }
+
+    form.hidden = true
+
+    // Two different submits, two different panels.
+    if (data.kind === 'vc') {
+      $('pt-success-vc-email').textContent = email
+      $('pt-success-vc').hidden = false
+      return
+    }
+
+    $('pt-success').hidden = false
+  })
+</script>

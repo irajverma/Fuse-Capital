@@ -1,0 +1,20 @@
+---
+import type { HTMLAttributes } from "astro/types"
+
+import { cn } from "@/lib/utils"
+
+type Props = HTMLAttributes<"nav">
+
+const { class: className = "", ...props } = Astro.props
+---
+
+<nav
+  {...props}
+  data-slot="navigation-menu"
+  class={cn(
+    "relative flex flex-1 items-center justify-center h-16",
+    className
+  )}
+>
+  <slot />
+</nav>

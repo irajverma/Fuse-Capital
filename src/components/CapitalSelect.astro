@@ -1,0 +1,50 @@
+---
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { Icon } from "@/components/ui/icon"
+import { fundingAmounts } from "@/data/funding"
+---
+
+<Select
+  class="w-full gap-0"
+  placeholder="How much capital do you need?"
+  position="popper"
+  side="bottom"
+  avoidCollisions={false}
+  lockScroll={false}
+  data-capital-select
+>
+  <SelectTrigger
+    showIcon={false}
+    aria-label="How much capital do you need?"
+    class="w-full cursor-pointer rounded-full !h-auto border-0 bg-background dark:bg-background hover:bg-background dark:hover:bg-background px-4 py-4 sm:px-7 sm:py-6 text-sm sm:text-md font-medium shadow-md"
+  >
+    <SelectValue />
+    <Icon name="chevron-down" class="size-6 opacity-60 transition-transform duration-150 group-data-[state=open]/select:rotate-180" />
+  </SelectTrigger>
+  <SelectContent class="w-(--anchor-width) max-h-64 overflow-y-auto shadow-lg" sideOffset={8}>
+    {fundingAmounts.map((f) => (
+      <SelectItem value={f.value} class="py-3 px-5">{f.label}</SelectItem>
+    ))}
+  </SelectContent>
+</Select>
+
+<script>
+  const capitalSelect = document.querySelector('[data-capital-select]')
+
+  capitalSelect?.addEventListener('select:change', (e) => {
+    const { value } = (e as CustomEvent<{ value: string }>).detail
+    if (!value) return
+    // Seed the onboarding draft so /apply can prefill the amount.
+    try {
+      const cur = JSON.parse(localStorage.getItem('mc_onboarding_draft') ?? '{}')
+      localStorage.setItem('mc_onboarding_draft', JSON.stringify({ ...cur, fundingAmount: value }))
+    } catch {}
+    window.location.href = '/apply'
+  })
+</script>

@@ -1,0 +1,48 @@
+---
+import DisplayCard from "./display-card.astro";
+
+interface CardData {
+  class?: string;
+  title?: string;
+  description?: string;
+  date?: string;
+}
+
+interface Props {
+  cards?: CardData[];
+}
+
+const defaultCards: CardData[] = [
+  {
+    class: "[grid-area:stack] hover:-translate-y-10",
+    title: "Apply in Minutes",
+    description: "Simple online application",
+    date: "Get started today",
+  },
+  {
+    class: "[grid-area:stack] translate-x-16 translate-y-10 hover:-translate-y-1",
+    title: "Same-Day Decision",
+    description: "Underwriters with direct access",
+    date: "Fast approval",
+  },
+  {
+    class: "[grid-area:stack] translate-x-32 translate-y-20 hover:translate-y-10",
+    title: "Funds Wired Fast",
+    description: "Capital in your account",
+    date: "Within minutes",
+  },
+];
+
+const { cards = defaultCards } = Astro.props;
+---
+
+<div class="grid [grid-template-areas:'stack'] place-items-center opacity-100 animate-in fade-in-0 duration-700">
+  {cards.map((card) => (
+    <DisplayCard
+      class={card.class}
+      title={card.title}
+      description={card.description}
+      date={card.date}
+    />
+  ))}
+</div>

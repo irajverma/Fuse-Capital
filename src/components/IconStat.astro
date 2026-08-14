@@ -1,0 +1,48 @@
+---
+import { Icon } from '@/components/ui/icon';
+
+interface Props {
+  /** Lucide icon name (see icon.astro iconMap) */
+  icon?: string;
+  /** Small uppercase subtitle above the value */
+  label: string;
+  /** Large emphasized value */
+  value: string;
+  /** Layout alignment of icon + text */
+  align?: 'center' | 'left';
+  /** Tailwind class for the value (main font color) */
+  valueColor?: string;
+  /** Tailwind class for the label (subtitle color) */
+  labelColor?: string;
+  /** Tailwind class for the icon circle background */
+  iconBg?: string;
+  /** Tailwind class for the icon foreground/stroke color */
+  iconColor?: string;
+  /** Extra classes for the outer wrapper */
+  class?: string;
+}
+
+const {
+  icon,
+  label,
+  value,
+  align = 'center',
+  valueColor = 'text-foreground',
+  labelColor = 'text-muted-foreground',
+  iconBg = 'bg-accent/50',
+  iconColor = 'text-accent-foreground',
+  class: className,
+} = Astro.props;
+
+const isCenter = align === 'center';
+---
+
+<div class:list={['flex flex-col gap-4 flex-1', isCenter ? 'items-center text-center' : 'items-start text-left', className]}>
+  <div class:list={['shrink-0 rounded-full p-4 w-16 h-16 flex items-center justify-center', iconBg]}>
+    <Icon name={icon} class:list={['w-7 h-7', iconColor]} />
+  </div>
+  <div>
+    <p class:list={['text-xs font-semibold tracking-widest uppercase', labelColor]}>{label}</p>
+    <p class:list={['text-2xl font-bold', valueColor]}>{value}</p>
+  </div>
+</div>

@@ -1,0 +1,381 @@
+---
+// All marketing/content pages should export prerender = true.
+// The site uses output: 'server' so the Cloudflare Worker is deployed (needed for /_image via
+// the IMAGES binding), but pages with no dynamic data are pre-rendered at build time and served
+// as static assets from the ASSETS binding. Add this export to any page that doesn't need
+// per-request server logic (no auth, no personalization, no live data).
+export const prerender = true;
+
+import Layout from '../layouts/Layout.astro';
+import { Picture } from 'astro:assets';
+
+import { Rating } from "@/components/ui/rating"
+import { Separator } from "@/components/ui/separator"
+import { Button } from "@/components/ui/button"
+import CapitalSelect from "@/components/CapitalSelect.astro"
+
+import Reviews4Block from "@/components/blocks/reviews-4.astro"
+import profileImage from "@/assets/person.webp"
+import heroImage from "@/assets/building.png"
+
+
+import Articles3Block from "@/components/blocks/articles-3.astro"
+import placeholderImage from "@/assets/placeholder.webp"
+import { getCollection, type CollectionEntry } from 'astro:content';
+
+const blogPosts = (await getCollection('blog', ({ data }: CollectionEntry<'blog'>) => !data.draft))
+  .sort((a: CollectionEntry<'blog'>, b: CollectionEntry<'blog'>) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  .slice(0, 4);
+
+function initials(name: string) {
+  return name.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase();
+}
+function formatDate(date: Date) {
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+import Faqs4Block from "@/components/blocks/faqs-4.astro"
+import Calculator from "@/components/Calculator.astro"
+import IconStat from "@/components/IconStat.astro"
+---
+
+
+<Layout
+	title="Funded Experts"
+	description="Working capital for your business in as little as 24 hours - no hidden fees and no impact to your credit score to check. $17M+ funded across 5,000+ businesses."
+	revealNavOnScroll
+	overlayScrollbar
+>
+	<section class="relative w-full h-screen overflow-hidden">
+		<Picture
+			src={heroImage}
+			alt="Modern office building"
+			class="absolute inset-0 w-full h-full object-cover"
+			widths={[640, 1024, 1536, 2048]}
+			sizes="100vw"
+			formats={['avif', 'webp']}
+			fallbackFormat="jpg"
+			quality={60}
+			loading="eager"
+			fetchpriority="high"
+		/>
+		<!-- Frosted frame: blur + saturate + cool-white tint. Fades bottom-to-top on mobile, left-to-right from md up. -->
+		<div
+			class="hero-frost absolute inset-0"
+			style="backdrop-filter: blur(16px) saturate(1.15); -webkit-backdrop-filter: blur(16px) saturate(1.15);"
+		></div>
+
+		<!-- Hero content -->
+		<div class="relative z-10 mx-auto flex h-full max-w-6xl flex-col justify-end px-6 pb-8 md:justify-center md:pb-0">
+			<div class="flex w-full flex-col gap-4 md:gap-6 md:max-w-xl">
+				<div class="flex items-center gap-2">
+					<Rating value={5} class="text-sidebar-primary" />
+					<span class="text-sm font-medium text-foreground/70">4.9 · Excellent on Trustpilot</span>
+				</div>
+
+				<h1 class="text-3xl md:text-6xl font-normal leading-[1.02] tracking-[-0.015em] text-foreground">
+					Get funded,<br> <i class="text-sidebar-primary">instantly</i>
+				</h1>
+
+				<p class="max-w-sm text-lg leading-relaxed text-foreground/70">
+					Working capital for your business: no hidden fees, and no impact to your credit score to check.
+				</p>
+
+				<div class="flex flex-col gap-3 md:flex-row md:items-center">
+					<CapitalSelect />
+					<Button as="a" href="/apply" class="w-full md:w-fit rounded-full !h-auto px-4 py-4 sm:px-7 sm:py-6 text-sm sm:text-md font-semibold shadow-md bg-sidebar-primary text-sidebar-primary-foreground hover:bg-sidebar-primary">Check eligibility</Button>
+				</div>
+
+				<Separator class="my-1 bg-foreground/20 md:hidden" />
+
+				<div class="mt-4 flex items-center justify-between text-center md:justify-start md:gap-6 md:text-left">
+					<div>
+						<p class="text-2xl font-normal">$89M+</p>
+						<p class="text-sm text-foreground/80">in SMB funding</p>
+					</div>
+					<Separator orientation="vertical" class="hidden h-10 bg-foreground md:block" />
+					<div>
+						<p class="text-2xl font-normal">2,000+</p>
+						<p class="text-sm text-foreground/80">businesses funded</p>
+					</div>
+					<Separator orientation="vertical" class="hidden h-10 bg-foreground md:block" />
+					<div>
+						<p class="text-2xl font-normal">A+</p>
+						<p class="text-sm text-foreground/80">BBB rating</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<Reviews4Block
+		reviews={[
+			{
+			rating: 5,
+			quote:
+				"We went around our broker and looked for a direct lender in search of a cheaper rate, and ended up saving $10k.",
+			image: profileImage,
+			initials: "MB",
+			name: "Mike B.",
+			role: "Rocket Alterations LLC",
+			},
+			{
+			rating: 5,
+			quote:
+				"We got funded in 48 hours, the whole process was transparent and straightforward.",
+			image: profileImage,
+			initials: "MP",
+			name: "Maya P.",
+			role: "Artisan Bakery Co.",
+			},
+			{
+			rating: 5,
+			quote:
+				"Funded experts' rates beat our bank by nearly 2%. They understood our business was seasonal and took that into account when drafting terms.",
+			image: profileImage,
+			initials: "JR",
+			name: "Jordan R.",
+			role: "Premium Home Services",
+			},
+			{
+			rating: 4.5,
+			quote:
+				"The process to funding was based off my revenue and cash flow, I was able to get approved even with a low credit score.",
+			image: profileImage,
+			initials: "KT",
+			name: "Kim T.",
+			role: "Tech Logistics Inc.",
+			},
+			{
+			rating: 5,
+			quote:
+				"We did a meeting with Matthew and he actually helped build a plan to make sure we wouldn't be overleveraged. We ended up paying off our loan early and got a discount, 10/10 service.",
+			image: profileImage,
+			initials: "RB",
+			name: "Ravi B.",
+			role: "Northwest Contracting",
+			},
+			{
+			rating: 5,
+			quote:
+				"No prepayment penalties, flexible terms, and they closed in under 5 days. This is how lending should work.",
+			image: profileImage,
+			initials: "SN",
+			name: "Sara N.",
+			role: "Elite Staffing Solutions",
+			},
+			{
+			rating: 5,
+			quote:
+				"Applied on a Tuesday, funded by Thursday. Couldn't believe how fast it moved.",
+			image: profileImage,
+			initials: "DL",
+			name: "Derek L.",
+			role: "Summit Roofing Co.",
+			},
+			{
+			rating: 5,
+			quote:
+				"They actually read my financials and came back with a real offer, not some algorithm-generated lowball.",
+			image: profileImage,
+			initials: "AC",
+			name: "Angela C.",
+			role: "Bright Line Marketing",
+			},
+			{
+			rating: 4.5,
+			quote:
+				"Straightforward process, no surprises at closing. Exactly what a small business owner needs.",
+			image: profileImage,
+			initials: "TW",
+			name: "Tom W.",
+			role: "Westside Auto Repair",
+			},
+			{
+			rating: 5,
+			quote:
+				"We'd been turned down twice by traditional banks. Funded Experts got us approved and funded in days.",
+			image: profileImage,
+			initials: "PG",
+			name: "Priya G.",
+			role: "Lotus Wellness Studio",
+			},
+			{
+			rating: 5,
+			quote:
+				"The terms were clear from day one. No hidden fees, no runaround. Exactly what they said it would be.",
+			image: profileImage,
+			initials: "JM",
+			name: "James M.",
+			role: "Harbor View Landscaping",
+			},
+			{
+			rating: 5,
+			quote:
+				"Our cash flow had a slow season but they still made it work. Very flexible and understanding team.",
+			image: profileImage,
+			initials: "CL",
+			name: "Carmen L.",
+			role: "Coastal Event Rentals",
+			},
+		]}
+		/>
+
+	<section class="w-full pt-16 pb-32 px-10">
+		<h1 class="mb-12 text-4xl font-semibold text-center">Why trust Funded Experts?</h1>
+		<div class="grid grid-cols-1 md:grid-cols-3 gap-10 max-w-6xl mx-auto">
+			<IconStat icon="calendar" label="Serving Small Business" value="13+ years" labelColor="text-gray-400" />
+			<IconStat icon="circle-dollar-sign" label="2025 Deal Flow" value="$89M in volume" labelColor="text-gray-400" />
+			<IconStat icon="building-2" label="Funded with us" value="2,000+ businesses" labelColor="text-gray-400" />
+			<IconStat icon="thumbs-up" label="Clients declined by a bank" value="8 out of 10 got funded" labelColor="text-gray-400" />
+			<IconStat icon="repeat" label="Return for a 2nd round" value="Over 60% of clients" labelColor="text-gray-400" />
+			<IconStat icon="piggy-bank" label="Average client savings" value="$8,400 vs. broker rates" labelColor="text-gray-400" />
+		</div>
+	</section>
+	<section class="bg-secondary w-full py-75 px-10">
+		<div class="mx-auto w-full max-w-6xl"> 
+			<h1 class="mb-12 text-4xl font-semibold text-center">How much can I qualify for?</h1>
+			<Calculator />
+		</div>
+	</section>
+
+	{blogPosts.length > 0 && (
+		<section class="w-full py-16">
+			<Articles3Block
+				title="Funding Resources"
+				articles={blogPosts.map((post) => ({
+					image: { src: post.data.coverImage ?? placeholderImage, alt: post.data.title },
+					category: post.data.tags?.[0] ?? 'Article',
+					title: post.data.title,
+					description: post.data.description,
+					href: `/blog/${post.id}`,
+					author: {
+						image: post.data.authorImage,
+						initials: initials(post.data.author),
+						name: post.data.author,
+						date: formatDate(post.data.pubDate),
+					},
+				}))}
+			/>
+		</section>
+
+		<section>
+			<Faqs4Block
+			title="FAQs"
+			faqs={[
+				{
+				id: "faq-4-1",
+				question: "What types of funding do you offer?",
+				answer:
+					`We offer term loans, lines of credit, merchant cash advances, invoice financing, equipment financing, consolidations, and cash credit loans. See <a href="/products">All financing types.</a>`,
+				},
+				{
+				id: "faq-4-2",
+				question: "Who is eligible?",
+				answer:
+					`Eligibility depends on time in business, monthly revenue, credit profile, and overall cash flow. We also factor in the industry, bank activity, and debt load. Want one of our underwriters to provide you with a personalized plan? <a href="/solutions/financing-plan">Get a personalized financing plan</a>, no commitment.`,
+				},
+				{
+				id: "faq-4-3",
+				question: "What documents do you need?",
+				answer:
+					"We require at least four months of business bank statements. If you already have positions, we ask for open balances or payoff letters.",
+				},
+				{
+				id: "faq-4-4",
+				question: "How fast can I get funded?",
+				answer:
+					"Time from bank statements to funding can take as little as <b>one hour</b>, though we see an <b>average of 24</b> hours from start to finish.",
+				},
+				{
+				id: "faq-4-5",
+				question: "How much can I borrow?",
+				answer:
+					"That depends on revenue, cash flow, credit strength, and the type of financing. Smaller short-term products may be based on daily or weekly receivables, while term loans may scale with business performance. Our maximum funding amount is <b>$5,000,000</b>.",
+				},
+				{
+				id: "faq-4-6",
+				question: "What are your rates and fees?",
+				answer:
+					"Our pricing is built to stay lean and predictable. In addition to low rates, we keep fees simple with modest one-time origination charges, and no hidden surprise. Rates can go as low as prime + 1.75% for lines of credit, 12% for MCAs, and 6% for term loans.",
+				},
+				{
+				id: "faq-4-7",
+				question: "Is there a prepayment penalty?",
+				answer:
+					"We actually offer <b>discounts if you pay off early!</b> For term loans, MCAs, and consolidations, a payoff within 30 days offers a 12% discount, 60 days means an 8% discount, and 90 days offers a 5% discount.",
+				},
+				{
+				id: "faq-4-8",
+				question: "How do repayments work?",
+				answer:
+					"Repayments may be daily, weekly, biweekly, or monthly, often at fixed amounts. Some products are automatically debited from your business bank account. The repayment cadence and structure are specific to your circumstances.",
+				},
+				{
+				id: "faq-4-9",
+				question: "What can the money be used for?",
+				answer:
+					"Working capital uses such as payroll, inventory, marketing, equipment, expansion, debt consolidation, and many more uses are encouraged, and the use of funds is at the discretion of the owner for most any purpose.",
+				},
+				{
+				id: "faq-4-10",
+				question: "Do you require a personal guarantee?",
+				answer:
+					"For unsecured or smaller-business products, we take a holistic look at your business and financial profile before making a decision. A personal guarantee may be required, which means the owner could be personally responsible if the business is unable to repay. Whether it applies depends on the product, the funding amount, and the overall risk profile.",
+				},
+				{
+				id: "faq-4-11",
+				question: "Do you check personal and business credit?",
+				answer:
+					"Yes, we review credit via <b>soft pulls</b>. We place much more weight on cash flow than credit, but an obviously alarming credit profile signals risk.",
+				},
+				{
+				id: "faq-4-12",
+				question: "Do you fund startups?",
+				answer:
+					"We prefer established businesses with a track record of revenue. Startups are usually harder to qualify for because there is less operating history to underwrite.",
+				},
+				{
+				id: "faq-4-13",
+				question: "Can I renew, refinance, or get more capital later?",
+				answer:
+					"We consider and encourage repeat funding, renewals, or refinances if the business has performed well. The timing and terms continuously improve as we are able to build rapport with you, and reserve repeat offers for existing customers.",
+				},
+				{
+				id: "faq-4-14",
+				question: "What happens if I miss a payment or run into trouble?",
+				answer:
+					"Possible outcomes include late fees, default charges, collections, or a draw on a personal guarantee. We prioritize figuring out a temporary arrangement, as we understand the success of your business helps both of us grow.",
+				},
+			]}
+			/>
+		</section>
+	)}
+
+</Layout>
+
+<style>
+	/* Below md: gradient fades from the bottom of the image up toward the top. */
+	.hero-frost {
+		background: rgba(235, 243, 252, 0.5);
+		-webkit-mask-image: linear-gradient(to top, #000 0%, rgba(0,0,0,0.9) 40%, transparent 90%);
+		mask-image: linear-gradient(to top, #000 0%, rgba(0,0,0,0.9) 40%, transparent 90%);
+	}
+
+	:global(.dark) .hero-frost {
+		background: rgba(4, 5, 14, 0.72);
+	}
+
+	/* md and up: fade from left to right. */
+	@media (min-width: 768px) {
+		.hero-frost {
+			-webkit-mask-image: linear-gradient(to right, #000 0%, #000 30%, transparent 52%);
+			mask-image: linear-gradient(to right, #000 0%, #000 30%, transparent 52%);
+		}
+
+		:global(.dark) .hero-frost {
+			-webkit-mask-image: linear-gradient(to right, #000 0%, #000 28%, rgba(0,0,0,0.5) 50%, transparent 70%);
+			mask-image: linear-gradient(to right, #000 0%, #000 28%, rgba(0,0,0,0.5) 50%, transparent 70%);
+		}
+	}
+</style>

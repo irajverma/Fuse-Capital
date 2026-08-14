@@ -1,0 +1,17 @@
+# Pre-approve build scripts for the packages C3 itself installs that need
+# them: `workerd` downloads the platform binary, `esbuild` and `sharp`
+# (via miniflare) download/build native bindings. Without these, pnpm 11+
+# aborts the install with ERR_PNPM_IGNORED_BUILDS.
+allowBuilds:
+  esbuild: true
+  workerd: true
+  sharp: true
+
+# Collapse the miniflare/workerd tree onto a single build. @cloudflare/vite-plugin
+# exact-pins miniflare 4.20260611.0, whose workerd 2026-06-11 binary crashes on
+# startup with "table _cf_ALARM has 3 columns but 2 values were supplied" during
+# astro build's prerender. Pin everything to the July-08 build wrangler already uses.
+overrides:
+  vite: ^7
+  miniflare: 4.20260708.1
+  workerd: 1.20260708.1

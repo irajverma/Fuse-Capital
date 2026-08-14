@@ -1,0 +1,16 @@
+---
+import { NavigationMenuLink } from "@/components/ui/navigation-menu"
+
+interface Props {
+  href: string
+  title: string
+  description: string
+}
+
+const { href, title, description } = Astro.props
+---
+
+<NavigationMenuLink href={href} class="w-full flex-col items-start">
+  <span class="leading-none font-medium">{title}</span>
+  <span class="text-muted-foreground line-clamp-3 sm:line-clamp-2 text-sm">{description}</span>
+</NavigationMenuLink>

@@ -1,0 +1,28 @@
+---
+import type { HTMLAttributes } from "astro/types"
+
+import { cn } from "@/lib/utils"
+
+type Props = HTMLAttributes<"div">
+
+const { class: className = "", ...props } = Astro.props
+---
+
+<div
+  {...props}
+  data-slot="navigation-menu-content"
+  class={cn(
+    // Full-width panel anchored to the bottom of the nav
+    "absolute left-0 top-full z-50 w-full",
+    // Card chrome
+    "border-t bg-background text-popover-foreground shadow-md",
+    // Hidden by default — JS controls visibility to avoid CSS-only flicker/overlap
+    "pointer-events-none invisible",
+    "**:data-[slot=navigation-menu-link]:focus:ring-0 **:data-[slot=navigation-menu-link]:focus:outline-none",
+    className
+  )}
+>
+  <div class="max-w-250 my-5 px-5 mx-auto">
+    <slot />
+  </div>
+</div>

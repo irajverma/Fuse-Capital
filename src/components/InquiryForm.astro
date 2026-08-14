@@ -1,0 +1,234 @@
+---
+import Input from '@/components/ui/input/input.astro';
+import DropdownMenu from '@/components/ui/dropdown-menu/dropdown-menu.astro';
+import DropdownMenuTrigger from '@/components/ui/dropdown-menu/dropdown-menu-trigger.astro';
+import DropdownMenuContent from '@/components/ui/dropdown-menu/dropdown-menu-content.astro';
+import Turnstile from '@/components/Turnstile.astro';
+import { Spinner } from '@/components/ui/spinner';
+import SendHorizontal from '@lucide/astro/icons/send-horizontal';
+import ChevronRight from '@lucide/astro/icons/chevron-right';
+import Check from '@lucide/astro/icons/check';
+import CircleAlert from '@lucide/astro/icons/circle-alert';
+
+interface Props {
+  context?: string;
+  prompt?: string;
+  /**
+   * Fixed reply-to address. When set (authenticated surfaces where we already know the user
+   * from the session), there is no email to collect and no Turnstile to pass, so the send
+   * button submits directly, no dropdown. Anonymous surfaces keep the popover flow.
+   */
+  email?: string;
+}
+
+const { context = '', prompt = '', email = '' } = Astro.props;
+---
+
+<div data-inquiry-root data-context={context} data-prompt={prompt} data-email={email || undefined} class="contents">
+  {email ? (
+    <!-- Authenticated: the button is the action itself. Success/error swap in-place. -->
+    <div class="contents">
+      <div data-inquiry-input-row>
+        <button data-inquiry-send type="button" class="inline-flex items-center gap-1.5 rounded-md bg-primary text-primary-foreground text-sm font-medium h-8 px-3 hover:bg-primary/90 transition-colors">
+          Send
+          <SendHorizontal data-inquiry-send-icon size={14} />
+          <Spinner data-inquiry-send-spinner class="hidden size-3.5" />
+        </button>
+      </div>
+
+      <div data-inquiry-success style="display:none" class="flex items-center gap-2 rounded-md bg-green-500/15 border border-green-500/20 px-3 h-8 text-sm font-medium text-green-700 dark:text-green-400">
+        <Check size={14} />
+        Sent, we'll be in touch.
+      </div>
+
+      <div data-inquiry-error style="display:none" class="flex items-center gap-2 rounded-md bg-destructive/10 border border-destructive/20 px-3 h-8 text-sm text-destructive">
+        <CircleAlert size={14} class="shrink-0" />
+        <span class="flex-1 text-xs">Something went wrong.</span>
+        <button data-inquiry-retry class="text-xs underline underline-offset-2 hover:no-underline whitespace-nowrap">Try again</button>
+      </div>
+
+      {/* Authenticated submissions pass Turnstile too (verified server-side). Invisible-first: the
+          client gates the Send button and falls back to a visible challenge if it does not resolve,
+          so a signed-in user whose check fails still has a widget to solve. */}
+      <Turnstile />
+    </div>
+  ) : (
+    <DropdownMenu>
+      <DropdownMenuTrigger data-inquiry-trigger class="inline-flex items-center gap-1.5 rounded-md bg-primary text-primary-foreground text-sm font-medium h-8 px-3 hover:bg-primary/90 transition-colors">
+        Send <ChevronRight data-inquiry-chevron size={15} class="transition-transform duration-125" />
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" class="min-w-[260px] p-3 rounded-md">
+        <div class="flex flex-col gap-3 px-1">
+          <p class="text-xs text-muted-foreground">Where should we send your match?</p>
+
+          <!-- input state (default) -->
+          <div data-inquiry-input-row class="flex gap-2">
+            <Input data-inquiry-email type="email" aria-label="Email address" placeholder="you@example.com" class="flex-1 h-8 text-sm" />
+            <button data-inquiry-send type="button" class="inline-flex items-center justify-center rounded-md bg-primary text-primary-foreground h-8 w-8 shrink-0 hover:bg-primary/90 transition-colors">
+              <SendHorizontal data-inquiry-send-icon size={14} />
+              <Spinner data-inquiry-send-spinner class="hidden size-3.5" />
+            </button>
+          </div>
+
+          <!-- success state -->
+          <div data-inquiry-success style="display:none" class="flex items-center gap-2 rounded-md bg-green-500/15 border border-green-500/20 px-3 h-8 text-sm font-medium text-green-700 dark:text-green-400">
+            <Check size={14} />
+            Sent, we'll be in touch.
+          </div>
+
+          <!-- error state -->
+          <div data-inquiry-error style="display:none" class="flex items-center gap-2 rounded-md bg-destructive/10 border border-destructive/20 px-3 h-8 text-sm text-destructive">
+            <CircleAlert size={14} class="shrink-0" />
+            <span class="flex-1 text-xs">Something went wrong.</span>
+            <button data-inquiry-retry class="text-xs underline underline-offset-2 hover:no-underline whitespace-nowrap">Try again</button>
+          </div>
+
+          {/* Anonymous submissions must pass Turnstile; authenticated ones are trusted server-side. */}
+          <Turnstile />
+        </div>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )}
+</div>
+
+<script>
+  import { preloadTurnstile, gateOnTurnstile } from '@/lib/turnstile';
+
+  // Multi-instance: bundled once, so wire every [data-inquiry-root] on the page. Each form finds
+  // its own sibling Quill editor (same [data-quill-root] ancestor) and scopes all its lookups.
+  function initInquiryForm(root: HTMLElement) {
+    const quillRoot = root.closest('[data-quill-root]') as HTMLElement | null;
+    const editorEl = quillRoot?.querySelector('[data-quill-editor]') as (HTMLElement & { quill?: any }) | null;
+    if (!editorEl) return;
+
+    const turnstileEl = root.querySelector('turnstile-widget') as HTMLElementTagNameMap['turnstile-widget'] | null;
+    const context = root.dataset.context ?? '';
+    const prompt = root.dataset.prompt ?? '';
+    // Fixed reply-to (authenticated surfaces): when present there's no email input to collect.
+    const fixedEmail = root.dataset.email ?? '';
+
+    // Optional "What's this about?" radios living elsewhere in the same [data-inquiry-scope]
+    // container (e.g. the bottom of the feedback dialog). The data-slot radio group mirrors
+    // its selection onto dataset.value; absent on surfaces without topics.
+    const topicGroup = root
+      .closest('[data-inquiry-scope]')
+      ?.querySelector('[data-inquiry-topics] [data-slot="radio-group"]') as HTMLElement | null ?? null;
+
+    const inputRow = root.querySelector('[data-inquiry-input-row]') as HTMLElement;
+    const successEl = root.querySelector('[data-inquiry-success]') as HTMLElement;
+    const errorEl = root.querySelector('[data-inquiry-error]') as HTMLElement;
+    const emailInput = root.querySelector('[data-inquiry-email]') as HTMLInputElement | null;
+    const sendBtn = root.querySelector('[data-inquiry-send]') as HTMLButtonElement;
+    const submitIcon = root.querySelector('[data-inquiry-send-icon]') as HTMLElement;
+    const submitSpinner = root.querySelector('[data-inquiry-send-spinner]') as HTMLElement;
+
+    function showState(state: 'input' | 'success' | 'error') {
+      inputRow.style.display = state === 'input' ? 'flex' : 'none';
+      successEl.style.display = state === 'success' ? 'flex' : 'none';
+      errorEl.style.display = state === 'error' ? 'flex' : 'none';
+    }
+
+    // Re-gate the authenticated Send button after a fresh challenge, so it re-enables only once the
+    // new token verifies (a bare reset() would leave the button enabled but tokenless).
+    const regateIfFixed = () => { if (fixedEmail && turnstileEl) gateOnTurnstile({ widget: turnstileEl, button: sendBtn }); };
+
+    (root.querySelector('[data-inquiry-retry]') as HTMLButtonElement).addEventListener('click', () => {
+      turnstileEl?.reset();
+      regateIfFixed();
+      showState('input');
+    });
+
+    function setup(quill: any) {
+      quill.once('text-change', preloadTurnstile);
+
+      // The authenticated variant has no popover to mount the widget on open, so gate its Send button
+      // on an invisible-first challenge now. gateOnTurnstile falls back to a visible challenge if it
+      // does not resolve, so a signed-in user can still complete it by hand.
+      regateIfFixed();
+
+      sendBtn.addEventListener('click', async () => {
+        const text = quill.getText().trim();
+        if (!text || text.length > 10_000) return;
+        if (!fixedEmail && !emailInput?.checkValidity()) return;
+        const replyTo = fixedEmail || (emailInput?.value.trim() ?? '');
+
+        // Every submission passes Turnstile (the server verifies it too), authenticated or not.
+        const token = turnstileEl?.getToken();
+        if (!token) return;
+
+        sendBtn.disabled = true;
+        submitIcon.classList.add('hidden');
+        submitSpinner.classList.remove('hidden');
+        try {
+          const res = await fetch('/api/inquiry', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              email: replyTo,
+              html: quill.getSemanticHTML(),
+              context,
+              prompt,
+              url: window.location.pathname,
+              ...(topicGroup?.dataset.value ? { topic: topicGroup.dataset.value } : {}),
+              ...(token ? { token } : {}),
+            }),
+          });
+          const data = await res.json() as { success: boolean; previewHtml?: string };
+          if (data.success) {
+            if (data.previewHtml) {
+              const preview = window.open('about:blank', '_blank');
+              if (preview) {
+                preview.document.write(data.previewHtml);
+                preview.document.close();
+              }
+            }
+            showState('success');
+          } else {
+            turnstileEl?.reset();
+            showState('error');
+          }
+        } catch {
+          turnstileEl?.reset();
+          showState('error');
+        } finally {
+          sendBtn.disabled = false;
+          submitIcon.classList.remove('hidden');
+          submitSpinner.classList.add('hidden');
+        }
+      });
+
+      emailInput?.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          sendBtn.click();
+        }
+      });
+    }
+
+    if (editorEl.quill) {
+      setup(editorEl.quill);
+    } else {
+      editorEl.addEventListener('quill:ready', () => setup((editorEl as any).quill), { once: true });
+    }
+
+    // Anonymous popover flow only: rotate the trigger chevron + lazily mount Turnstile when
+    // the send popover opens. The authenticated variant has no dropdown to observe.
+    const trigger = root.querySelector('[data-inquiry-trigger]');
+    const dropdownContent = trigger
+      ?.closest('[data-slot="dropdown-menu"]')
+      ?.querySelector('[data-slot="dropdown-menu-content"]');
+
+    if (dropdownContent) {
+      const sendChevron = root.querySelector('[data-inquiry-chevron]') as HTMLElement;
+      new MutationObserver(async () => {
+        const isOpen = !dropdownContent.hasAttribute('hidden');
+        sendChevron.style.transform = isOpen ? 'rotate(90deg)' : '';
+        if (isOpen) {
+          await turnstileEl?.mount();
+        }
+      }).observe(dropdownContent, { attributes: true, attributeFilter: ['hidden'] });
+    }
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-inquiry-root]').forEach(initInquiryForm);
+</script>

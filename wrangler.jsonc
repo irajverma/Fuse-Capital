@@ -1,0 +1,60 @@
+{
+	"compatibility_date": "2026-06-18",
+	"compatibility_flags": [
+		"global_fetch_strictly_public",
+		"nodejs_compat"
+	],
+	"name": "fundedexperts-frontend",
+	// Custom entrypoint (src/worker.ts) re-exports the Astro handler.
+	"main": "./src/worker.ts",
+	"assets": {
+		"directory": "./dist/client",
+		"binding": "ASSETS"
+	},
+	"observability": {
+		"enabled": true,
+		"logs": {
+			"head_sampling_rate": 1
+		},
+		"traces": {
+			"enabled": true,
+			"head_sampling_rate": 0.01
+		}
+	},
+	"images": {
+		"binding": "IMAGES"
+	},
+	// One rate-limit namespace per public form, all keyed by client IP.
+	"ratelimits": [
+		{
+			"name": "RATE_LIMITER",
+			"namespace_id": "1001",
+			"simple": {
+				"limit": 5,
+				"period": 60
+			}
+		},
+		{
+			"name": "RATE_LIMITER_APPLY",
+			"namespace_id": "1002",
+			"simple": {
+				"limit": 5,
+				"period": 60
+			}
+		},
+		{
+			"name": "RATE_LIMITER_PARTNER",
+			"namespace_id": "1003",
+			"simple": {
+				"limit": 5,
+				"period": 60
+			}
+		}
+	],
+	// DEV_BYPASS makes the Turnstile widget auto-verify and the API stubs skip siteverify,
+	// so local dev needs no real Turnstile keys. It must only ever exist here, at the top
+	// level (local wrangler dev); never add it to a deployed environment's vars.
+	"vars": {
+		"DEV_BYPASS": "1"
+	}
+}

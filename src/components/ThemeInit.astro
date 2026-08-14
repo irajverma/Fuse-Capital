@@ -1,0 +1,24 @@
+---
+// Shared pre-paint bootstrap for the document root. Runs inline in <head> before the
+// first paint so returning visitors never see a flash of the wrong state.
+//   theme       — light by default; switch to dark only when explicitly chosen.
+//                 Stored in localStorage under "theme".
+//   navEngaged  — once a visitor has used the topbar, the reveal-on-scroll nav is
+//                 pinned from the first frame instead of hidden. The flag lives in
+//                 localStorage under "navEngaged"; NEVER rename that key — it is the
+//                 durability contract that survives redeploys and HTML changes. Applied
+//                 here as html[data-nav-engaged]; the pin rule itself is in global.css.
+---
+
+<script is:inline>
+  ;(function () {
+    try {
+      if (localStorage.getItem('theme') === 'dark') {
+        document.documentElement.classList.add('dark')
+      }
+      if (localStorage.getItem('navEngaged')) {
+        document.documentElement.dataset.navEngaged = '1'
+      }
+    } catch {}
+  })()
+</script>

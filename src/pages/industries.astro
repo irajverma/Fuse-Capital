@@ -1,0 +1,176 @@
+---
+export const prerender = true;
+
+import { getImage } from 'astro:assets';
+import Layout from '../layouts/Layout.astro';
+import { Button } from '@/components/ui/button';
+import IndustryCard from '@/components/IndustryCard.astro';
+import IconStat from '@/components/IconStat.astro';
+import heroBg from '../assets/industries-hero.jpg';
+import { industryCategories, categoryDotColor } from '@/data/industries';
+
+const optimizedHeroBg = await getImage({ src: heroBg, format: 'webp' });
+
+const trustStats = [
+  { icon: 'calendar', label: 'Serving small business', value: '13+ years' },
+  { icon: 'circle-dollar-sign', label: '2025 deal flow', value: '$16M in volume' },
+  { icon: 'building-2', label: 'Funded with us', value: '4,000+ businesses' },
+];
+
+const total = industryCategories.reduce((n, c) => n + c.items.length, 0);
+
+const chipLabel: Record<string, string> = {
+  transport: 'Transportation',
+  pro: 'Professional',
+};
+
+const filters = [
+  { key: 'all', label: 'All' },
+  ...industryCategories.map((c) => ({ key: c.key, label: chipLabel[c.key] ?? c.label })),
+];
+---
+
+<Layout title="All Industries | Funded Experts" description="Funding built for your industry. Browse every industry we fund and find what fits your business.">
+  <header
+    class="relative overflow-hidden text-center px-6 py-20 sm:py-28 bg-cover bg-center"
+    style={`background-image: url('${optimizedHeroBg.src}')`}
+  >
+    <span class="absolute inset-0 bg-gradient-to-b from-background/5 via-background/40 to-background pointer-events-none"></span>
+
+    <div class="relative z-10 max-w-3xl mx-auto">
+      <div class="text-xs font-semibold tracking-widest text-primary uppercase mb-4">Industries we fund</div>
+      <h1 class="text-4xl sm:text-5xl font-light tracking-tight leading-tight text-foreground">Funding built for your industry.</h1>
+      <p class="text-lg text-muted-foreground mt-4 max-w-md mx-auto">Same-day decisions, shaped around how your industry actually earns.</p>
+
+      <div class="relative max-w-md mx-auto mt-8">
+        <svg class="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4-4"></path></svg>
+        <input
+          id="fe-search"
+          type="text"
+          placeholder={`Search ${total} industries…`}
+          class="w-full box-border pl-11 pr-4 py-3.5 rounded-full border border-border bg-background text-foreground text-[15px] outline-none shadow-sm focus:ring-2 focus:ring-ring"
+        />
+      </div>
+
+      <div class="flex flex-wrap gap-2.5 justify-center mt-6 max-w-3xl mx-auto">
+        {filters.map((f, i) => (
+          <button
+            data-filter={f.key}
+            class:list={[
+              'px-4 py-2 rounded-full border text-[13.5px] font-medium cursor-pointer transition-colors',
+              i === 0 ? 'bg-foreground text-background border-foreground' : 'bg-background text-muted-foreground border-border hover:border-foreground/30',
+            ]}
+          >
+            {f.label}
+          </button>
+        ))}
+      </div>
+      <p class="text-[13.5px] text-muted-foreground mt-5">
+        Showing <span id="fe-count" class="text-foreground font-semibold">{total}</span> of {total} industries
+      </p>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-6 py-14">
+    {industryCategories.map((cat) => (
+      <div data-group={cat.key} class="mb-12">
+        <div class="flex items-center gap-3.5 mb-5">
+          <span class:list={['w-2.5 h-2.5 rounded-full shrink-0', categoryDotColor[cat.color]]}></span>
+          <span class="text-xs font-semibold tracking-widest text-muted-foreground uppercase whitespace-nowrap">{cat.label}</span>
+          <span class="flex-1 h-px bg-border"></span>
+        </div>
+        <div class="grid gap-4" style="grid-template-columns: repeat(auto-fill, minmax(232px, 1fr));">
+          {cat.items.map((item) => (
+            <IndustryCard item={item} categoryKey={cat.key} color={cat.color} />
+          ))}
+        </div>
+      </div>
+    ))}
+
+    <div id="fe-noresults" class="hidden text-center py-16">
+      <p class="text-lg text-muted-foreground">No industries match that search. <span class="text-primary font-semibold">We still likely fund it</span>, try the calculator below.</p>
+    </div>
+  </main>
+
+  <section class="bg-secondary px-6 py-16 sm:py-20">
+    <div class="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-8 text-center sm:text-left pb-14 border-b border-border/60">
+      <div>
+        <h2 class="text-2xl sm:text-3xl font-light tracking-tight text-foreground">Don't see your industry?</h2>
+        <p class="text-muted-foreground leading-relaxed mt-2 max-w-md">This list isn't the limit. If you run a business and bring in revenue, there's almost always a path.</p>
+      </div>
+      <Button as="a" href="/solutions/apply" class="shrink-0 gap-2">
+        Check what you qualify for
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="M13 6l6 6-6 6"></path></svg>
+      </Button>
+    </div>
+
+    <div class="max-w-3xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-x-6 gap-y-10 text-center pt-14">
+      {trustStats.map((stat) => (
+        <IconStat
+          icon={stat.icon}
+          label={stat.label}
+          value={stat.value}
+          iconBg="bg-primary/15"
+          iconColor="text-primary"
+          labelColor="text-muted-foreground"
+          valueColor="text-foreground"
+        />
+      ))}
+    </div>
+  </section>
+
+  <script>
+    function initIndustryFilter() {
+      const search = document.querySelector<HTMLInputElement>('#fe-search')
+      const chips = document.querySelectorAll<HTMLButtonElement>('[data-filter]')
+      const cards = document.querySelectorAll<HTMLAnchorElement>('[data-card]')
+      const groups = document.querySelectorAll<HTMLElement>('[data-group]')
+      const countEl = document.querySelector('#fe-count')
+      const noResults = document.querySelector<HTMLElement>('#fe-noresults')
+      if (!search || !cards.length || (search as any)._initialized) return
+      ;(search as any)._initialized = true
+      let activeCat = 'all'
+
+      const setChip = (chip: HTMLButtonElement, active: boolean) => {
+        chip.classList.toggle('bg-foreground', active)
+        chip.classList.toggle('text-background', active)
+        chip.classList.toggle('border-foreground', active)
+        chip.classList.toggle('bg-background', !active)
+        chip.classList.toggle('text-muted-foreground', !active)
+        chip.classList.toggle('border-border', !active)
+      }
+
+      const apply = () => {
+        const q = (search.value || '').trim().toLowerCase()
+        let visible = 0
+        cards.forEach((c) => {
+          const name = c.getAttribute('data-name') || ''
+          const cat = c.getAttribute('data-cat') || ''
+          const matchCat = activeCat === 'all' || cat === activeCat
+          const matchQ = !q || name.indexOf(q) !== -1
+          const show = matchCat && matchQ
+          c.style.display = show ? 'flex' : 'none'
+          if (show) visible++
+        })
+        groups.forEach((g) => {
+          const gc = g.querySelectorAll<HTMLElement>('[data-card]')
+          const any = Array.prototype.some.call(gc, (c: HTMLElement) => c.style.display !== 'none')
+          g.style.display = any ? '' : 'none'
+        })
+        if (countEl) countEl.textContent = String(visible)
+        if (noResults) noResults.classList.toggle('hidden', visible !== 0)
+      }
+
+      search.addEventListener('input', apply)
+      chips.forEach((chip) => {
+        chip.addEventListener('click', () => {
+          activeCat = chip.getAttribute('data-filter') || 'all'
+          chips.forEach((x) => setChip(x, x === chip))
+          apply()
+        })
+      })
+    }
+    initIndustryFilter()
+    document.addEventListener('astro:page-load', initIndustryFilter)
+  </script>
+</Layout>

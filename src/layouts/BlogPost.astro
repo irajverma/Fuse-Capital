@@ -1,0 +1,149 @@
+---
+import type { ImageMetadata } from 'astro';
+import { Image } from 'astro:assets';
+import Layout from './Layout.astro';
+import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+
+type Props = {
+  frontmatter: {
+    title: string;
+    description: string;
+    pubDate: Date;
+    author?: string;
+    authorImage?: ImageMetadata;
+    tags?: string[];
+    coverImage?: ImageMetadata;
+  };
+};
+
+const { frontmatter } = Astro.props;
+const { title, description, pubDate, author, authorImage, tags, coverImage } = frontmatter;
+
+function initials(name: string) {
+  return name.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase();
+}
+
+const formattedDate = pubDate.toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+---
+
+<Layout title={title} description={description}>
+  <section class="py-16">
+    <div class="max-w-3xl mx-auto px-4">
+      <nav class="mb-8">
+        <Button as="a" variant="ghost" size="sm" href="/blog" class="-ml-2 text-muted-foreground">
+          ← Back to Blog
+        </Button>
+      </nav>
+
+      <header class="mb-10">
+        {tags && tags.length > 0 && (
+          <div class="flex flex-wrap gap-2 mb-4">
+            {tags.map((tag) => (
+              <span class="text-xs font-medium px-2.5 py-1 rounded-full bg-accent/50 text-accent-foreground">
+                {tag}
+              </span>
+            ))}
+          </div>
+        )}
+        <h1 class="text-4xl font-bold tracking-tight mb-4">{title}</h1>
+        <p class="text-muted-foreground text-lg mb-4">{description}</p>
+        {author && (
+          <div class="flex items-center gap-3 text-sm text-muted-foreground">
+            <Avatar>
+              <AvatarImage src={authorImage} alt={author} />
+              <AvatarFallback>{initials(author)}</AvatarFallback>
+            </Avatar>
+            <div>
+              <p class="font-medium text-foreground">{author}</p>
+              <time datetime={pubDate.toISOString()}>{formattedDate}</time>
+            </div>
+          </div>
+        )}
+        {!author && (
+          <time datetime={pubDate.toISOString()} class="text-sm text-muted-foreground">{formattedDate}</time>
+        )}
+      </header>
+
+      {coverImage && (
+        <Image
+          src={coverImage}
+          alt=""
+          class="w-full rounded-xl mb-10 aspect-video object-cover"
+          widths={[640, 960, 1280]}
+          sizes="(min-width: 48rem) 48rem, 100vw"
+        />
+      )}
+
+      <article class="prose-content">
+        <slot />
+      </article>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  @reference "../styles/global.css";
+
+  .prose-content :global(h2) {
+    @apply text-2xl font-semibold mt-10 mb-4 tracking-tight;
+  }
+  .prose-content :global(h3) {
+    @apply text-xl font-semibold mt-8 mb-3 tracking-tight;
+  }
+  .prose-content :global(p) {
+    @apply text-base leading-7 mb-5;
+  }
+  .prose-content :global(a) {
+    @apply text-primary underline underline-offset-4 hover:opacity-80 transition-opacity;
+  }
+  .prose-content :global(ul) {
+    @apply list-disc pl-6 mb-5 space-y-1;
+  }
+  .prose-content :global(ol) {
+    @apply list-decimal pl-6 mb-5 space-y-1;
+  }
+  .prose-content :global(li) {
+    @apply leading-7;
+  }
+  .prose-content :global(blockquote) {
+    @apply border-l-4 border-accent pl-4 italic text-muted-foreground my-6;
+  }
+  .prose-content :global(code:not(pre code)) {
+    @apply bg-muted rounded px-1.5 py-0.5 text-sm font-mono;
+  }
+  .prose-content :global(pre) {
+    @apply bg-muted rounded-xl p-5 overflow-x-auto mb-5 text-sm;
+  }
+  .prose-content :global(img) {
+    @apply rounded-xl my-6 w-full;
+  }
+  .prose-content :global(hr) {
+    @apply border-border my-10;
+  }
+  .prose-content :global(strong) {
+    @apply font-semibold;
+  }
+  .prose-content :global(table) {
+    @apply w-full mb-6 text-sm border-collapse;
+  }
+  .prose-content :global(thead) {
+    @apply border-b-2;
+    border-color: var(--secondary);
+  }
+  .prose-content :global(th) {
+    @apply p-2 text-left font-semibold;
+    border: 1px solid var(--secondary);
+  }
+  .prose-content :global(td) {
+    @apply p-2;
+    border: 1px solid var(--secondary);
+  }
+  .prose-content :global(tr:nth-child(even)) {
+    background-color: color-mix(in oklch, var(--secondary) 30%, transparent);
+  }
+</style>

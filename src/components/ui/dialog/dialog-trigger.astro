@@ -1,0 +1,16 @@
+---
+import type { HTMLAttributes } from "astro/types"
+
+import { Button, type ButtonVariantProps } from "@/components/ui/button"
+
+// This always renders a <button>, so type it as the button element's attributes plus the button
+// variants. (ComponentProps<typeof Button> collapses Button's generic `as` to a union of every
+// element and drops button-only attrs like `type`/`disabled`, which are valid here.)
+type Props = HTMLAttributes<"button"> & ButtonVariantProps
+
+const { ...props } = Astro.props
+---
+
+<Button data-slot="dialog-trigger" {...props}>
+  <slot />
+</Button>

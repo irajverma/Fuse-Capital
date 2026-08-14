@@ -1,0 +1,81 @@
+---
+import Separator from './ui/separator/separator.astro';
+import { Icon } from "@/components/ui/icon";
+
+interface Props {
+  index: number;
+  href: string;
+  category: string;
+  title: string;
+  description: string;
+  bestFor: string;
+  amountLabel: string;
+  amount: string;
+  timeToFund: string;
+  termLength: string;
+  repayment: string;
+  rateCost: string;
+}
+
+const { index, href, category, title, description, bestFor, amountLabel, amount, timeToFund, termLength, repayment } = Astro.props;
+const num = String(index).padStart(2, '0');
+---
+
+<!-- Mobile (below sm) -->
+<div class="sm:hidden rounded-xl border border-border bg-card p-6 flex flex-col gap-4">
+  <div class="grid grid-cols-[auto_1fr] gap-4">
+    <span class="text-sm font-semibold text-primary bg-secondary rounded-lg self-stretch aspect-square flex items-center justify-center">{num}</span>
+    <div class="flex flex-col gap-2">
+      <span class="text-xs font-semibold uppercase tracking-widest text-muted-foreground">{category}</span>
+      <h2 class="text-xl font-bold text-foreground">{title}</h2>
+    </div>
+  </div>
+  <p class="text-md text-muted-foreground">{description}</p>
+  <Separator />
+  <div class="grid grid-cols-2 gap-4">
+    <div>
+      <span class="block text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-1">{amountLabel}</span>
+      <span class="text-sm font-semibold text-foreground">{amount}</span>
+    </div>
+    <div>
+      <span class="block text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-1">Time to Fund</span>
+      <span class="text-sm font-semibold text-foreground">{timeToFund}</span>
+    </div>
+    <div>
+      <span class="block text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-1">Term Length</span>
+      <span class="text-sm font-semibold text-foreground">{termLength}</span>
+    </div>
+    <div>
+      <span class="block text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-1">Repayment</span>
+      <span class="text-sm font-semibold text-foreground">{repayment}</span>
+    </div>
+  </div>
+  <Separator />
+  <a href={href} class="flex items-center justify-between gap-3 bg-secondary p-3 hover:underline hover:bg-accent/10">
+    <span class="text-sm text-foreground"><span class="font-bold">Best for:</span> {bestFor}</span>
+    <Icon name="arrow-right" class="shrink-0 text-muted-foreground" />
+  </a>
+</div>
+
+<!-- Desktop (sm+) -->
+<a href={href} class="hidden sm:flex group rounded-xl border border-border bg-card p-6 flex-row items-start gap-6 transition-shadow hover:shadow-lg">
+  <div class="flex items-start gap-4 flex-1">
+    <span class="text-sm font-semibold text-primary bg-secondary rounded-lg px-3 py-2 shrink-0">{num}</span>
+    <div class="flex flex-col gap-2">
+      <span class="text-xs font-semibold uppercase tracking-widest text-muted-foreground">{category}</span>
+      <h2 class="text-xl font-bold text-foreground group-hover:underline">{title}</h2>
+      <p class="text-md text-muted-foreground">{description}</p>
+    </div>
+  </div>
+  <Separator orientation="vertical" />
+  <div class="flex flex-col gap-4 shrink-0 w-50">
+    <div>
+      <span class="block text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-1">Best For</span>
+      <span class="text-sm font-semibold text-foreground">{bestFor}</span>
+    </div>
+    <div>
+      <span class="block text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-1">{amountLabel}</span>
+      <span class="text-sm font-semibold text-foreground">{amount}</span>
+    </div>
+  </div>
+</a>

@@ -1,0 +1,56 @@
+---
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion"
+import { Card, CardContent, CardHeader } from "@/components/ui/card"
+
+import DisplayCards from "./ui/display-cards.astro";
+
+---
+<div class="mx-auto w-full max-w-6xl">
+    <section class="grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-24 items-center max-w-6xl mx-auto px-6 py-20">
+        <div class="flex flex-col h-full">
+            <Card class="w-full h-full text-white bg-transparent border-white/20">
+            <CardHeader>
+                <h1 class="text-4xl font-bold">Steps to Funding</h1>
+            </CardHeader>
+            <CardContent>
+                <Accordion>
+                <AccordionItem value="item-1">
+                    <AccordionTrigger class="text-xl">Tell us about your business.</AccordionTrigger>
+                    <AccordionContent>
+                    Answer a few simple questions and complete the application in minutes.
+                    </AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="item-2">
+                    <AccordionTrigger class="text-xl">Submit your application.</AccordionTrigger>
+                    <AccordionContent>
+                    We'll look at your metrics and underwrite an offer.
+                    </AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="item-3">
+                    <AccordionTrigger class="text-xl">Compare offers.</AccordionTrigger>
+                    <AccordionContent>
+                    Work with us one-on-one to take the deal that best fits your business.
+                    </AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="item-4">
+                    <AccordionTrigger class="text-xl">Get funded.</AccordionTrigger>
+                    <AccordionContent>
+                    Once you accept, funding can come in same-day. Our underwriters have decision-maker access and can wire funds within minutes.
+                    </AccordionContent>
+                </AccordionItem>
+                </Accordion>
+            </CardContent>
+            </Card>
+        </div>
+        <div class="w-full h-full min-w-0 overflow-hidden flex items-center justify-center">
+            <DisplayCards />
+        </div>
+    </section>
+</div>
+
+

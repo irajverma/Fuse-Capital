@@ -1,0 +1,381 @@
+---
+import { Slider } from "@/components/ui/slider"
+import { Input } from "@/components/ui/input"
+import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupText } from "@/components/ui/input-group"
+
+import {
+  Combobox,
+  ComboboxContent,
+  ComboboxEmpty,
+  ComboboxInput,
+  ComboboxItem,
+  ComboboxList,
+} from "@/components/ui/combobox"
+
+import { Field, FieldContent, FieldLabel, FieldTitle } from "@/components/ui/field"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { Button } from "@/components/ui/button"
+import { Icon } from "@/components/ui/icon"
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible"
+import { PRODUCTS } from "@/lib/calculator-config"
+import { industryCategories } from "@/data/industries"
+
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+
+const industries = industryCategories
+  .flatMap(cat => cat.items)
+  .sort((a, b) => a.name.localeCompare(b.name))
+---
+
+<div class:list={["bg-background p-6 rounded-xl min-h-20 outline", className]} data-calculator>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-3" data-calculator-form>
+    <div class="flex flex-col gap-3 md:col-start-1 md:row-start-1">
+        <p>Monthly revenue</p>
+        <InputGroup class="w-full">
+            <InputGroupAddon align="inline-start">
+                <InputGroupText>$</InputGroupText>
+            </InputGroupAddon>
+            <InputGroupInput type="text" inputmode="numeric" aria-label="Monthly revenue" data-format-number data-max="200000" data-max-plus data-connects="revenue" placeholder="" class="py-1.5" />
+        </InputGroup>
+        <Slider
+        defaultValue={100000}
+        max={200000}
+        step={1}
+        thumbAlignment="edge"
+        thumbLabel="Monthly revenue"
+        data-connects="revenue"
+        class="w-full mt-1 mb-8"
+        />
+    </div>
+    <div class="flex flex-col gap-3 md:col-start-1 md:row-start-2">
+        <p>Credit score</p>
+        <Input type="text" inputmode="numeric" aria-label="Credit score" data-format-number data-max="850" data-connects="credit" maxlength="3" class="w-full" placeholder="" />
+        <Slider
+        defaultValue={650}
+        max={850}
+        step={1}
+        thumbAlignment="edge"
+        thumbLabel="Credit score"
+        data-connects="credit"
+        class="w-full mt-1 mb-8"
+        />
+    </div>
+    <div class="flex flex-col gap-3 md:col-start-2 md:row-start-1">
+        <p>Time in business</p>
+        <RadioGroup name="time-in-business" class="grid grid-cols-2 gap-2 w-full">
+            <FieldLabel class="w-full hover:bg-secondary rounded-md" data-radio-card>
+                <Field orientation="horizontal">
+                    <RadioGroupItem value="0-6-months" />
+                    <FieldContent>
+                        <FieldTitle>0 – 6 months</FieldTitle>
+                    </FieldContent>
+                </Field>
+            </FieldLabel>
+            <FieldLabel class="w-full hover:bg-secondary rounded-md" data-radio-card>
+                <Field orientation="horizontal">
+                    <RadioGroupItem value="6-11-months" />
+                    <FieldContent>
+                        <FieldTitle>6 – 11 months</FieldTitle>
+                    </FieldContent>
+                </Field>
+            </FieldLabel>
+            <FieldLabel class="w-full hover:bg-secondary rounded-md" data-radio-card>
+                <Field orientation="horizontal">
+                    <RadioGroupItem value="1-3-years" />
+                    <FieldContent>
+                        <FieldTitle>1 – 3 years</FieldTitle>
+                    </FieldContent>
+                </Field>
+            </FieldLabel>
+            <FieldLabel class="w-full hover:bg-secondary rounded-md" data-radio-card>
+                <Field orientation="horizontal">
+                    <RadioGroupItem value="3-plus-years" />
+                    <FieldContent>
+                        <FieldTitle>3+ years</FieldTitle>
+                    </FieldContent>
+                </Field>
+            </FieldLabel>
+        </RadioGroup>
+    </div>
+    <div class="flex flex-col gap-3 md:col-start-2 md:row-start-2">
+        <p>Industry</p>
+        <Combobox class="w-full">
+            <ComboboxInput aria-label="Industry" placeholder="Select an industry" />
+            <ComboboxContent>
+                <ComboboxEmpty>No industries found.</ComboboxEmpty>
+                <ComboboxList>
+                    {industries.map(industry => (
+                        <ComboboxItem value={industry.slug}>{industry.name}</ComboboxItem>
+                    ))}
+                </ComboboxList>
+            </ComboboxContent>
+        </Combobox>
+        <div class="flex gap-2 justify-end mt-auto">
+            <Button variant="ghost" class="hover:cursor-pointer" data-reset>Reset Calculator</Button>
+            <Button class="hover:cursor-pointer" data-calculate>Calculate</Button>
+        </div>
+    </div>
+  </div>
+  <div data-calculator-result class="hidden flex-col gap-4">
+    <Button variant="ghost" class="hover:cursor-pointer self-start flex items-center gap-1 px-2" data-reset>
+      <Icon name="chevron-left" class="size-4" />
+      Back
+    </Button>
+    <div data-result-offers class="flex flex-col gap-4">
+      <div class="flex flex-col items-center gap-1 text-center">
+        <p class="text-sm text-muted-foreground">Based on your business information you could qualify for up to</p>
+        <p class="text-4xl font-bold" data-result-max></p>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      {PRODUCTS.map(p => (
+        <div data-product-card={p.id} class="border rounded-xl p-4 flex flex-col gap-2">
+          <div class="flex justify-between items-center">
+            <span class="font-semibold">{p.name}</span>
+            <span class="text-lg font-bold" data-product-amount></span>
+          </div>
+          <Collapsible class="group">
+            <CollapsibleTrigger class="flex items-center gap-1 text-sm text-muted-foreground cursor-pointer hover:text-foreground transition-colors">
+              Funding details
+              <Icon name="chevron-down" class="size-3.5 transition-transform group-data-[state=open]:rotate-180" />
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <div class="mt-2 grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
+                <span class="text-muted-foreground">Term</span><span>{p.termMonths} months</span>
+                <span class="text-muted-foreground">Factor rate</span><span>{p.factorRate}</span>
+                <span class="text-muted-foreground">Cost of capital</span><span>{p.costOfCapital}</span>
+              </div>
+            </CollapsibleContent>
+          </Collapsible>
+          <a href={p.applyUrl} class="inline-flex items-center justify-center rounded-md bg-primary text-primary-foreground text-sm font-medium h-9 px-4 hover:bg-primary/90 transition-colors">
+            Apply now
+          </a>
+        </div>
+      ))}
+      </div>
+    </div>
+    <div data-result-declined class="hidden flex-col items-center gap-3 py-6 text-center">
+      <p class="text-lg font-semibold">We're unable to provide an offer at this time</p>
+      <p class="text-sm text-muted-foreground max-w-sm" data-decline-message></p>
+    </div>
+  </div>
+</div>
+
+<script>
+  import { calculate, type CalculatorInputs, type CalculatorResult, type ProductOffer, type TimeInBusiness } from '@/lib/calculator';
+
+  function fmt(n: number) {
+    return n.toLocaleString('en-US');
+  }
+
+  function renderResult(result: CalculatorResult, resultEl: HTMLElement) {
+    const offersEl  = resultEl.querySelector<HTMLElement>('[data-result-offers]');
+    const declineEl = resultEl.querySelector<HTMLElement>('[data-result-declined]');
+
+    if (result.declined) {
+      offersEl?.classList.add('hidden');
+      declineEl?.classList.remove('hidden');
+      declineEl?.classList.add('flex');
+      const msgEl = declineEl?.querySelector<HTMLElement>('[data-decline-message]');
+      if (msgEl) msgEl.textContent = result.declineMessage;
+      return;
+    }
+
+    declineEl?.classList.add('hidden');
+    declineEl?.classList.remove('flex');
+    offersEl?.classList.remove('hidden');
+
+    const maxEl = resultEl.querySelector<HTMLElement>('[data-result-max]');
+    if (maxEl) maxEl.textContent = `$${fmt(result.maxFunding)}`;
+    result.products.forEach((p: ProductOffer) => {
+      const amountEl = resultEl.querySelector<HTMLElement>(`[data-product-card="${p.id}"] [data-product-amount]`);
+      if (amountEl) amountEl.textContent = `$${fmt(p.amount)}`;
+    });
+  }
+
+  function initNumberInputs() {
+    document.querySelectorAll<HTMLInputElement>('[data-format-number]').forEach(input => {
+      if ((input as any)._numInitialized) return;
+      (input as any)._numInitialized = true;
+      input.addEventListener('input', () => {
+        const cursorFromEnd = input.value.length - (input.selectionEnd ?? input.value.length);
+        const raw = input.value.replace(/\D/g, '');
+        const formatted = raw ? Number(raw).toLocaleString('en-US') : '';
+        input.value = formatted;
+        const pos = Math.max(0, formatted.length - cursorFromEnd);
+        input.setSelectionRange(pos, pos);
+      });
+      const max = input.dataset.max ? Number(input.dataset.max) : null;
+      if (max !== null) {
+        input.addEventListener('blur', () => {
+          const raw = Number(input.value.replace(/\D/g, ''));
+          if (!raw) return;
+          const clamped = Math.min(raw, max);
+          const suffix = 'maxPlus' in input.dataset && clamped >= max ? '+' : '';
+          input.value = clamped.toLocaleString('en-US') + suffix;
+        });
+      }
+    });
+  }
+
+  function initSliderConnections() {
+    document.querySelectorAll<HTMLInputElement>('[data-connects]').forEach(input => {
+      if (!(input instanceof HTMLInputElement) || (input as any)._sliderConnected) return;
+      (input as any)._sliderConnected = true;
+
+      const key = input.dataset.connects;
+      const slider = document.querySelector<HTMLElement>(`[data-slot="slider"][data-connects="${key}"]`);
+      if (!slider) return;
+
+      // Slider → Input: update and format when slider moves
+      const sliderMax = slider.dataset.max ? Number(slider.dataset.max) : null;
+      slider.addEventListener('slider:change', (e: Event) => {
+        const value = (e as CustomEvent).detail?.value;
+        if (typeof value === 'number') {
+          const suffix = 'maxPlus' in input.dataset && sliderMax !== null && value >= sliderMax ? '+' : '';
+          input.value = value.toLocaleString('en-US') + suffix;
+        }
+      });
+
+      // Input → Slider: sync on every keystroke and on blur
+      const syncToSlider = () => {
+        const raw = Number(input.value.replace(/\D/g, ''));
+        if (!raw) return;
+        slider.dispatchEvent(new CustomEvent('slider:set', { detail: { value: raw } }));
+      };
+      input.addEventListener('input', syncToSlider);
+      input.addEventListener('blur', syncToSlider);
+    });
+  }
+
+  function initCalculator() {
+    const card = document.querySelector<HTMLElement>('[data-calculator]');
+    if (!card || (card as any)._calcInitialized) return;
+    (card as any)._calcInitialized = true;
+
+    const form = card.querySelector<HTMLElement>('[data-calculator-form]')!;
+    const result = card.querySelector<HTMLElement>('[data-calculator-result]')!;
+    const calcBtn = card.querySelector<HTMLElement>('[data-calculate]')!;
+
+    const resetForm = () => {
+      // Clear number inputs and validation state
+      form.querySelectorAll<HTMLInputElement>('[data-format-number]').forEach(input => {
+        input.value = '';
+        input.removeAttribute('aria-invalid');
+      });
+      form.querySelector<HTMLElement>('[data-slot="combobox-input"]')?.removeAttribute('aria-invalid');
+      form.querySelectorAll<HTMLElement>('[data-slot="radio-group"]').forEach(g => setGroupInvalid(g, false));
+
+      // Reset sliders to defaults, then clear inputs (slider:set fires slider:change which writes to input)
+      const revenueSlider = form.querySelector<HTMLElement>('[data-slot="slider"][data-connects="revenue"]');
+      const creditSlider  = form.querySelector<HTMLElement>('[data-slot="slider"][data-connects="credit"]');
+      revenueSlider?.dispatchEvent(new CustomEvent('slider:set', { detail: { value: 100000 } }));
+      creditSlider?.dispatchEvent(new CustomEvent('slider:set',  { detail: { value: 650 } }));
+      // Wipe the inputs again since slider:change will have re-populated them
+      form.querySelectorAll<HTMLInputElement>('[data-format-number]').forEach(input => {
+        input.value = '';
+      });
+
+      // Clear combobox
+      const comboboxRoot = form.querySelector<HTMLElement>('[data-slot="combobox"]');
+      comboboxRoot?.dispatchEvent(new CustomEvent('combobox:set', { detail: { value: null } }));
+
+      // Clear radio groups
+      form.querySelectorAll<HTMLElement>('[data-slot="radio-group"]').forEach(group => {
+        group.dispatchEvent(new CustomEvent('radio-group:set', { detail: { value: null } }));
+      });
+    };
+
+    const isFormComplete = () => {
+      const revenue = form.querySelector<HTMLInputElement>('input[data-connects="revenue"]');
+      const credit  = form.querySelector<HTMLInputElement>('input[data-connects="credit"]');
+      const combobox = form.querySelector<HTMLElement>('[data-slot="combobox"]');
+      const radios  = form.querySelectorAll<HTMLElement>('[data-slot="radio-group"]');
+      return (
+        !!revenue?.value.trim() &&
+        !!credit?.value.trim() &&
+        !!combobox?.dataset.value &&
+        [...radios].every(g => !!g.dataset.value)
+      );
+    };
+
+    const revenue = form.querySelector<HTMLInputElement>('input[data-connects="revenue"]');
+    const credit  = form.querySelector<HTMLInputElement>('input[data-connects="credit"]');
+    const combobox = form.querySelector<HTMLElement>('[data-slot="combobox"]');
+    const comboboxInput = combobox?.querySelector<HTMLInputElement>('[data-slot="combobox-input"]');
+
+    revenue?.addEventListener('input', () => {
+      if (revenue.value.trim()) revenue.removeAttribute('aria-invalid');
+    });
+    credit?.addEventListener('input', () => {
+      if (credit.value.trim()) credit.removeAttribute('aria-invalid');
+    });
+    combobox?.addEventListener('combobox:change', () => {
+      comboboxInput?.removeAttribute('aria-invalid');
+    });
+
+    const setGroupInvalid = (group: HTMLElement, invalid: boolean) => {
+      group.querySelectorAll<HTMLElement>('[data-radio-card]').forEach(card => {
+        card.style.borderColor = invalid ? 'var(--destructive)' : '';
+        card.style.boxShadow  = invalid ? '0 0 0 3px color-mix(in oklch, var(--destructive) 20%, transparent)' : '';
+      });
+    };
+
+    form.querySelectorAll<HTMLElement>('[data-slot="radio-group"]').forEach(group => {
+      group.addEventListener('radio-group:change', () => {
+        setGroupInvalid(group, false);
+      });
+    });
+
+    calcBtn.addEventListener('click', () => {
+      if (revenue && !revenue.value.trim()) revenue.setAttribute('aria-invalid', 'true');
+      if (credit  && !credit.value.trim())  credit.setAttribute('aria-invalid', 'true');
+      if (comboboxInput && !combobox?.dataset.value) comboboxInput.setAttribute('aria-invalid', 'true');
+      form.querySelectorAll<HTMLElement>('[data-slot="radio-group"]').forEach(group => {
+        setGroupInvalid(group, !group.dataset.value);
+      });
+      if (!isFormComplete()) return;
+
+      const revenueInput = form.querySelector<HTMLInputElement>('input[data-connects="revenue"]');
+      const creditInput  = form.querySelector<HTMLInputElement>('input[data-connects="credit"]');
+      const timeGroup    = form.querySelector<HTMLElement>('[data-slot="radio-group"][data-name="time-in-business"]');
+      const inputs: CalculatorInputs = {
+        monthlyRevenue: Number((revenueInput?.value ?? '').replace(/\D/g, '')),
+        creditScore:    Number((creditInput?.value ?? '').replace(/\D/g, '')),
+        industry:       combobox?.dataset.value ?? '',
+        timeInBusiness: (timeGroup?.dataset.value ?? '') as TimeInBusiness,
+      };
+      renderResult(calculate(inputs), result);
+
+      form.classList.add('hidden');
+      result.classList.remove('hidden');
+      result.classList.add('flex');
+    });
+
+    card.querySelectorAll<HTMLElement>('[data-reset]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        result.classList.add('hidden');
+        result.classList.remove('flex');
+        form.classList.remove('hidden');
+        resetForm();
+      });
+    });
+  }
+
+  initNumberInputs();
+  initSliderConnections();
+  initCalculator();
+  document.addEventListener('astro:page-load', () => {
+    initNumberInputs();
+    initSliderConnections();
+    initCalculator();
+  });
+</script>
+
