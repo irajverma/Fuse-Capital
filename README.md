@@ -1,4 +1,4 @@
-# Funded Experts — marketing site
+# Funded Experts Frontend 
 
 The public marketing site for Funded Experts: Astro 6 on Cloudflare Workers
 (`@astrojs/cloudflare`), Tailwind CSS 4, and a small set of island UI components.
