@@ -59,3 +59,6 @@ planned, not broken; build them out as designs land.
 
 Light/dark theme is class-based: `ThemeInit` sets it before paint, `ThemeToggle` flips
 it, and both are already wired into the layout.
+
+## Stale Deps/dep issue with using Astro Cloudflare adapter;
+delete cache `rm -rf node_modules/.vite`, it's an OptimizeDeps issue
