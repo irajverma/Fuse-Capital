@@ -13,6 +13,8 @@
 		"dev:wrangler": "pnpm dev-vars && astro build && node scripts/dev-vars.mjs --watch -- wrangler dev",
 		"build": "astro build",
 		"preview": "astro build && wrangler dev --port 8788",
+		"deploy:prod": "node scripts/deploy.mjs",
+		"deploy:dry": "node scripts/deploy.mjs --dry-run",
 		"astro": "astro",
 		"test": "vitest run",
 		"test:watch": "vitest",

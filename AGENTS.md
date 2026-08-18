@@ -9,3 +9,7 @@
 - Run tests with `pnpm test` (never `npx vitest` - it pulls an incompatible runner).
 - Local forms work without real Turnstile keys: `DEV_BYPASS` in `wrangler.jsonc`
   auto-verifies the widget and the stubs skip verification.
+- Deploy with `pnpm deploy:prod` (`scripts/deploy.mjs`), never a bare
+  `astro build && wrangler deploy`: the form pages are prerendered, so a default build
+  bakes `DEV_BYPASS` and the test Turnstile sitekey into the shipped HTML. See the
+  Deploying section of the README before changing anything in that path.

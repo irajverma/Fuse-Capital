@@ -56,5 +56,50 @@
 	// level (local wrangler dev); never add it to a deployed environment's vars.
 	"vars": {
 		"DEV_BYPASS": "1"
+	},
+	// Deploy target: `pnpm deploy:prod` runs `wrangler deploy --env production`. The worker keeps the
+	// same name as the default block, so there is exactly one deployed script; this block exists so
+	// the deploy does NOT pick up the DEV_BYPASS var above. wrangler never inherits top-level `vars`
+	// into a named environment, which is what keeps Turnstile real in production. Bindings are
+	// non-inheritable for the same reason, so IMAGES and the rate limiters are repeated verbatim
+	// (same namespace ids: same worker, same namespaces). Everything inheritable - main, assets,
+	// compatibility_date/flags, observability - is deliberately NOT repeated.
+	//
+	// The two Turnstile keys are deployed secrets, not vars: set them once per worker with
+	// `wrangler secret put turnstile_site_key --env production` (and turnstile_secret_key). Locally
+	// they come from .dev.vars, generated from .env.dev by `pnpm dev-vars`.
+	"env": {
+		"production": {
+			"name": "fundedexperts-frontend",
+			"images": {
+				"binding": "IMAGES"
+			},
+			"ratelimits": [
+				{
+					"name": "RATE_LIMITER",
+					"namespace_id": "1001",
+					"simple": {
+						"limit": 5,
+						"period": 60
+					}
+				},
+				{
+					"name": "RATE_LIMITER_APPLY",
+					"namespace_id": "1002",
+					"simple": {
+						"limit": 5,
+						"period": 60
+					}
+				},
+				{
+					"name": "RATE_LIMITER_PARTNER",
+					"namespace_id": "1003",
+					"simple": {
+						"limit": 5,
+						"period": 60
+					}
+				}
+			]
+		}
 	}
 }

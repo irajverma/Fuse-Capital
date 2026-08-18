@@ -40,6 +40,51 @@ out of the box.
 | `pnpm preview`      | Build, then serve the built output on :8788                         |
 | `pnpm test`         | Unit tests (Vitest); `pnpm test:watch` for watch mode               |
 | `pnpm astro check`  | Type-check `.astro` and `.ts` files                                 |
+| `pnpm deploy:dry`   | Full production build + every deploy check, uploading nothing       |
+| `pnpm deploy:prod`  | Deploy to the `fundedexperts-frontend` worker                       |
+
+`pnpm run deploy:prod`, not `pnpm deploy` — pnpm has a built-in `deploy` command that
+would shadow a script by that name, which is why the script is not called `deploy`.
+
+## Deploying
+
+One worker, one environment: `fundedexperts-frontend`, declared as `env.production` in
+`wrangler.jsonc`. Deploying needs a Cloudflare account with permission to create/update
+Workers — `wrangler login` (or `CLOUDFLARE_API_TOKEN`) first.
+
+```bash
+cp .env.prod.example .env.prod   # real Turnstile keys, git-ignored
+pnpm deploy:dry                  # builds and runs every check, uploads nothing
+pnpm deploy:prod                 # the real thing
+```
+
+Then, once per worker, push the runtime secrets (a deploy never uploads them):
+
+```bash
+wrangler secret put turnstile_site_key --env production
+wrangler secret put turnstile_secret_key --env production
+```
+
+`pnpm deploy:prod` is `scripts/deploy.mjs` rather than a bare `astro build &&
+wrangler deploy`, because two things about this stack fail silently and only in
+production:
+
+- **`wrangler deploy` does not read `wrangler.jsonc`.** The Astro adapter writes a
+  resolved copy to `dist/server/wrangler.json` and redirects wrangler at it, so the
+  *build* decides what ships. The script builds with `CLOUDFLARE_ENV=production` (set
+  in-process, since a `VAR=value cmd` prefix does not work on Windows).
+- **The form pages are prerendered**, so the Turnstile widget is frozen into static HTML
+  at build time. A plain `pnpm build` bakes in `DEV_BYPASS=1` and Cloudflare's always-pass
+  *test* sitekey — a deployed site whose captcha does nothing in the browser and whose
+  form posts are then rejected server-side. `env.production` declares no `vars` (wrangler
+  never inherits top-level `vars` into a named environment) so `DEV_BYPASS` is dropped,
+  and `.env.prod` becomes `.dev.vars.production`, which the production build loads
+  *instead of* `.dev.vars`.
+
+The script asserts both against the built output before it uploads anything, and refuses
+to deploy if it finds test keys. The first deploy also provisions the `SESSION` KV
+namespace the Astro adapter declares; wrangler prompts for it, so run that one
+interactively.
 
 ## Pages
 
