@@ -10,7 +10,15 @@ intake runs elsewhere, so keep their request/response contracts exactly as they 
 
 ## Getting started
 
-Prerequisites: Node >= 22.12 and [pnpm](https://pnpm.io).
+Prerequisites: Node >= 22.12 and Corepack (`corepack enable` — Corepack ships with
+Node and pins [pnpm](https://pnpm.io) to the version in `packageManager`, so you get
+the right one without installing pnpm globally).
+
+pnpm 10.25+ is required, and older versions fail in ways that do not name the real
+cause: `pnpm-workspace.yaml` here carries settings (no `packages:` key, `allowBuilds`)
+that only newer pnpm parses. On 9.x and 10.0–10.5 `pnpm install` aborts with
+"packages field missing or empty"; on 10.6–10.24 it installs but warns
+"Ignored build scripts: esbuild, sharp, workerd". Let Corepack handle it.
 
 ```bash
 cp .env.dev.example .env.dev
