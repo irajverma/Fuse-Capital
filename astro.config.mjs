@@ -30,8 +30,17 @@ export default defineConfig({
   // IMAGES binding ('cloudflare-binding') is kept as the runtime service so any future on-demand
   // page can still transform images on the fly. Binding responses are NOT auto-cached, so we keep
   // it off the hot path for static pages.
+  //
+  // remoteBindings defaults to TRUE in @cloudflare/vite-plugin, which makes dev/build call the
+  // Cloudflare API at startup to wire up remote bindings. Nothing here needs that - every binding
+  // is either simulated locally (rate limiters, assets) or unused in dev (IMAGES, see above) - and
+  // on a proxied network that call comes back as a plain-text error page, which the plugin parses
+  // with .json(), crashing `astro dev` before it serves anything. This replaces the
+  // CLOUDFLARE_VITE_FORCE_LOCAL=true prefix the build scripts used to carry: that env var's only
+  // effect in the plugin is setting this exact field, and a POSIX env prefix breaks on Windows.
   adapter: cloudflare({
     imageService: isDev ? 'passthrough' : { build: 'compile', runtime: 'cloudflare-binding' },
+    remoteBindings: false,
   }),
 
   prefetch: {

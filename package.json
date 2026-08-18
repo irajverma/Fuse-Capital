@@ -10,9 +10,9 @@
 	"scripts": {
 		"dev-vars": "node scripts/dev-vars.mjs",
 		"dev": "node scripts/dev-vars.mjs --watch -- astro dev",
-		"dev:wrangler": "pnpm dev-vars && CLOUDFLARE_VITE_FORCE_LOCAL=true astro build && node scripts/dev-vars.mjs --watch -- wrangler dev",
-		"build": "CLOUDFLARE_VITE_FORCE_LOCAL=true astro build",
-		"preview": "CLOUDFLARE_VITE_FORCE_LOCAL=true astro build && wrangler dev --port 8788",
+		"dev:wrangler": "pnpm dev-vars && astro build && node scripts/dev-vars.mjs --watch -- wrangler dev",
+		"build": "astro build",
+		"preview": "astro build && wrangler dev --port 8788",
 		"astro": "astro",
 		"test": "vitest run",
 		"test:watch": "vitest",
