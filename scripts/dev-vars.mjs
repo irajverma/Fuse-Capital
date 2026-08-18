@@ -73,7 +73,16 @@ if (process.argv[1]?.endsWith('dev-vars.mjs')) {
   if (command.length > 0) {
     // The watcher lives and dies with the dev server it was started for, so no orphan is left
     // rewriting .dev.vars after you have moved on.
-    const child = spawn(command[0], command.slice(1), { stdio: 'inherit', shell: false })
+    //
+    // shell is required on Windows: the dev command is a bin shim (`astro`, `wrangler`), and pnpm
+    // writes those as `astro.CMD`. Without a shell, spawn goes straight to CreateProcess, whose
+    // PATH search only ever appends .com/.exe - it never finds a .CMD, and the run dies with
+    // `spawn astro ENOENT`. Everywhere else, spawn the binary directly: no shell to quote through,
+    // and signals reach the dev server rather than an intermediate shell.
+    const child = spawn(command[0], command.slice(1), {
+      stdio: 'inherit',
+      shell: process.platform === 'win32',
+    })
     for (const signal of ['SIGINT', 'SIGTERM']) {
       process.on(signal, () => child.kill(signal))
     }
