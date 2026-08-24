@@ -1,0 +1,170 @@
+---
+export const prerender = true;
+
+import Layout from '../../layouts/Layout.astro';
+import { Button } from '@/components/ui/button';
+import { Icon } from '@/components/ui/icon';
+
+const predefinedPrompts = [
+  'What is the minimum monthly revenue required for a line of credit?',
+  'How does a Merchant Cash Advance compare to a traditional bank loan?',
+  'Can I qualify for funding if my business was declined by a bank?',
+  'What documents do I need to submit for instant underwriting?',
+];
+
+const knowledgeTopics = [
+  { title: 'Qualification Criteria', count: '14 Answers', desc: 'Credit score thresholds, time in business, and bank deposit guidelines.' },
+  { title: 'Product Comparison', count: '18 Answers', desc: 'Detailed breakdowns of MCA, Term Loans, Credit Lines, and Consolidations.' },
+  { title: 'Application & Funding', count: '12 Answers', desc: 'Turnstile verification, document uploads, and 24-hour wire deposits.' },
+];
+---
+
+<Layout
+  title="Ask AI Knowledge Assistant | Funded Experts"
+  description="Get instant, accurate answers about small business lending, qualification rules, and products powered by our knowledge base."
+>
+  <header class="bg-background border-b border-border/60 py-16 sm:py-20 px-6 text-center">
+    <div class="max-w-3xl mx-auto flex flex-col items-center gap-4">
+      <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-primary/10 border border-primary/20 text-xs font-semibold uppercase tracking-wider text-primary">
+        <Icon name="sparkles" class="size-3.5 text-primary" />
+        AI Knowledge Assistant
+      </div>
+      <h1 class="text-3xl sm:text-5xl font-light tracking-tight text-foreground">
+        Ask AI Anything About Business Funding
+      </h1>
+      <p class="text-base sm:text-lg text-muted-foreground max-w-xl">
+        Instant, transparent answers regarding qualification criteria, rates, terms, and application procedures.
+      </p>
+    </div>
+  </header>
+
+  <main class="py-14 px-6 max-w-4xl mx-auto space-y-12">
+    <!-- Interactive Search / Question Interface -->
+    <div class="bg-card border border-border rounded-2xl p-6 sm:p-8 shadow-sm space-y-6">
+      <div class="space-y-2">
+        <label for="ai-query" class="text-sm font-medium text-foreground block">
+          Type your question below:
+        </label>
+        <div class="relative">
+          <input
+            id="ai-query"
+            type="text"
+            placeholder="e.g. Can I get a line of credit with 620 credit score?"
+            class="w-full h-12 pl-4 pr-24 rounded-xl border border-border bg-background text-foreground text-sm outline-none focus:ring-2 focus:ring-ring"
+          />
+          <button
+            id="ai-submit"
+            type="button"
+            class="absolute right-1.5 top-1.5 bottom-1.5 px-4 bg-primary text-primary-foreground text-xs font-semibold rounded-lg hover:bg-primary/90 transition-colors"
+          >
+            Ask AI
+          </button>
+        </div>
+      </div>
+
+      <!-- Suggested Prompts -->
+      <div class="space-y-2 pt-2">
+        <p class="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+          Suggested Questions:
+        </p>
+        <div class="flex flex-wrap gap-2">
+          {predefinedPrompts.map((prompt) => (
+            <button
+              data-prompt={prompt}
+              class="text-xs text-muted-foreground hover:text-foreground bg-secondary/80 hover:bg-secondary border border-border/60 rounded-lg px-3 py-2 text-left transition-colors cursor-pointer"
+            >
+              {prompt}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <!-- AI Response Box -->
+      <div id="ai-response" class="hidden bg-secondary/40 border border-border rounded-xl p-5 space-y-3">
+        <div class="flex items-center gap-2 text-primary font-semibold text-sm">
+          <Icon name="sparkles" class="size-4" />
+          Funded Experts AI Answer:
+        </div>
+        <p id="ai-answer-text" class="text-sm text-foreground leading-relaxed">
+          Loading answer...
+        </p>
+      </div>
+    </div>
+
+    <!-- Knowledge Topics Grid -->
+    <div class="space-y-6">
+      <h2 class="text-2xl font-light tracking-tight text-foreground text-center">
+        Explore Knowledge Topics
+      </h2>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {knowledgeTopics.map((topic) => (
+          <div class="bg-card border border-border rounded-xl p-6 flex flex-col gap-2">
+            <span class="text-xs font-semibold text-primary">{topic.count}</span>
+            <h3 class="text-base font-semibold text-foreground">{topic.title}</h3>
+            <p class="text-xs text-muted-foreground leading-relaxed">{topic.desc}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="bg-secondary px-8 py-10 rounded-2xl text-center flex flex-col items-center gap-3">
+      <h3 class="text-xl font-semibold text-foreground">Prefer speaking directly with an underwriting expert?</h3>
+      <p class="text-xs text-muted-foreground max-w-md">
+        Our team is available 5 days a week to review your bank statements and structure custom financing.
+      </p>
+      <Button as="a" href="/resources/partnerships" class="h-10 px-6 text-sm font-medium mt-2">
+        Contact Our Team
+      </Button>
+    </div>
+  </main>
+
+  <script>
+    function initAskAI() {
+      const input = document.querySelector<HTMLInputElement>('#ai-query');
+      const submit = document.querySelector<HTMLButtonElement>('#ai-submit');
+      const responseBox = document.querySelector<HTMLElement>('#ai-response');
+      const answerText = document.querySelector<HTMLElement>('#ai-answer-text');
+      const promptBtns = document.querySelectorAll<HTMLButtonElement>('[data-prompt]');
+
+      if (!input || !submit || (input as any)._aiInit) return;
+      (input as any)._aiInit = true;
+
+      const answers: Record<string, string> = {
+        'credit': 'We work with credit scores as low as 550. Our underwriting evaluates overall monthly revenue ($10,000+ minimum) and bank deposit consistency rather than personal credit alone.',
+        'revenue': 'The minimum required revenue is $10,000 per month ($120,000 annually) in gross bank deposits over the past 3 to 4 months.',
+        'compare': 'A Merchant Cash Advance (MCA) provides upfront funds repaid via flexible daily percentages of revenue. A Term Loan offers fixed daily or weekly payments over a set duration (3 to 24 months).',
+        'default': 'Qualifying for business funding requires at least 6 months in operation and $10,000+ in monthly bank deposits. Submissions involve zero hard credit impact to view options.'
+      };
+
+      const respond = (query: string) => {
+        if (!query.trim()) return;
+        if (responseBox) responseBox.classList.remove('hidden');
+        const qLower = query.toLowerCase();
+        let match = answers['default'];
+        if (qLower.includes('credit') || qLower.includes('score')) match = answers['credit'];
+        else if (qLower.includes('revenue') || qLower.includes('minimum')) match = answers['revenue'];
+        else if (qLower.includes('mca') || qLower.includes('compare') || qLower.includes('bank loan')) match = answers['compare'];
+
+        if (answerText) answerText.textContent = match;
+      };
+
+      submit.addEventListener('click', () => respond(input.value));
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') respond(input.value);
+      });
+
+      promptBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const text = btn.dataset.prompt ?? '';
+          input.value = text;
+          respond(text);
+        });
+      });
+    }
+
+    initAskAI();
+    document.addEventListener('astro:page-load', initAskAI);
+  </script>
+</Layout>

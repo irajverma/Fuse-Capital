@@ -1,0 +1,3 @@
+interface:
+  display_name: "Deploy Check"
+  short_description: "Pre-flight audit and dry-run check before Cloudflare deployment"

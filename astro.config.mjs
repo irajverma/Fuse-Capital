@@ -63,9 +63,7 @@ export default defineConfig({
         transformIndexHtml: (html) => html.replace(/<!--(?!\[if)[\s\S]*?-->/g, ''),
       },
     ],
-    ssr: {
-      noExternal: ['@lucide/astro'],
-    },
+
     optimizeDeps: {
       exclude: ['astro:content', '@astrojs/cloudflare'],
       // Pre-bundle every real dep that reaches the SSR graph so Vite never
@@ -88,6 +86,7 @@ export default defineConfig({
       include: [
         'astro/content/runtime',
         'astro/content/runtime-assets',
+        'astro/assets/services/noop',
         // astro/zod is Astro's re-exported zod, pulled in by astro:actions /
         // astro:schema. Discovered lazily on the first request that reaches it
         // → stale astro_zod.js?v= 404.
@@ -96,12 +95,7 @@ export default defineConfig({
         'clsx',
         'tailwind-merge',
         'class-variance-authority',
-        // @lucide/astro ships raw .ts (hence ssr.noExternal above) and is imported
-        // one file per icon, so every icon is its own SSR dep entry, discovered
-        // lazily on the first page that renders it. Same stale ?v= race as the
-        // entries above. The glob expands against the package exports map
-        // (all ~1700 icons), so newly adopted icons are already seeded.
-        '@lucide/astro/icons/*',
+
         // @data-slot/* are hydrated island UI components, so they land in the
         // CLIENT optimize dir (.vite/deps/, not deps_ssr/), but the same stale
         // `?v=<hash>` re-optimize race applies: each is discovered lazily on the

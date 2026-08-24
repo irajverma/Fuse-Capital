@@ -1,0 +1,94 @@
+---
+export const prerender = true;
+
+import Layout from '../../layouts/Layout.astro';
+import { Button } from '@/components/ui/button';
+import { Icon } from '@/components/ui/icon';
+
+const highlights = [
+  { value: '$89M+', label: 'Total Volume Funded', desc: 'Working capital deployed directly to small business owners across America.' },
+  { value: '4,200+', label: 'SMBs Funded', desc: 'Contractors, restaurants, retail stores, and service providers empowered.' },
+  { value: '24 Hours', label: 'Average Time-to-Fund', desc: 'Streamlined digital underwriting cut approval turnaround in half.' },
+  { value: '91%', label: 'Offer Acceptance Rate', desc: 'Transparent terms and competitive factor rates won client trust.' },
+];
+
+const trends = [
+  {
+    title: '1. Shift Towards Revenue-Based Financing',
+    text: 'Traditional bank loan originations for SMBs fell 14% as strict collateral requirements locked out growing companies. Revenue-based capital and merchant cash advances stepped in as the primary liquidity solution for fast-moving businesses.',
+  },
+  {
+    title: '2. Construction & Trades Cash Flow Compression',
+    text: 'General contractors experienced average payment draw delays of 90 days. Short-term lines of credit and mobilization loans surged as essential tools to bridge project starts and vendor materials.',
+  },
+  {
+    title: '3. Digital Underwriting & Same-Day Deposits',
+    text: 'Paperless bank statement analysis enabled instant pre-approvals. Over 68% of Funded Experts clients received decision offers in under 3 hours without visiting a bank branch.',
+  },
+];
+---
+
+<Layout
+  title="2025 Year in Review | Funded Experts"
+  description="Key trends, market insights, and data takeaways from the past year in small business lending and revenue financing."
+>
+  <header class="bg-background border-b border-border/60 py-16 sm:py-24 px-6 text-center">
+    <div class="max-w-3xl mx-auto flex flex-col items-center gap-4">
+      <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-primary/10 border border-primary/20 text-xs font-semibold uppercase tracking-wider text-primary">
+        <Icon name="calendar" class="size-3.5" />
+        Annual Industry Insights
+      </div>
+      <h1 class="text-3xl sm:text-5xl font-light tracking-tight text-foreground">
+        2025 Year in Review
+      </h1>
+      <p class="text-base sm:text-lg text-muted-foreground max-w-xl">
+        Key trends, lending volume data, and actionable takeaways from small business financing over the past 12 months.
+      </p>
+    </div>
+  </header>
+
+  <main class="py-16 px-6 max-w-5xl mx-auto space-y-16">
+    <!-- Stat Grid -->
+    <section class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 text-center">
+      {highlights.map((h) => (
+        <div class="bg-card border border-border rounded-2xl p-6 flex flex-col gap-2">
+          <p class="text-3xl sm:text-4xl font-bold text-foreground">{h.value}</p>
+          <p class="text-sm font-semibold text-primary">{h.label}</p>
+          <p class="text-xs text-muted-foreground leading-relaxed mt-1">{h.desc}</p>
+        </div>
+      ))}
+    </section>
+
+    <!-- Key Market Trends -->
+    <section class="bg-secondary/40 border border-border rounded-2xl p-8 sm:p-12 space-y-8">
+      <div class="max-w-2xl">
+        <h2 class="text-2xl sm:text-3xl font-light tracking-tight text-foreground">
+          Top 3 Trends Shaping Business Financing
+        </h2>
+        <p class="text-sm text-muted-foreground mt-2">
+          An analysis of macroeconomic shifts, bank lending tightening, and alternative financing adoption.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 gap-6">
+        {trends.map((trend) => (
+          <div class="bg-card border border-border/80 rounded-xl p-6 flex flex-col gap-2">
+            <h3 class="text-lg font-semibold text-foreground">{trend.title}</h3>
+            <p class="text-sm text-muted-foreground leading-relaxed">{trend.text}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- Call to Action -->
+    <section class="bg-primary text-primary-foreground rounded-2xl p-10 text-center flex flex-col items-center gap-4">
+      <h2 class="text-2xl sm:text-3xl font-light">Position your business for growth in 2026</h2>
+      <p class="text-sm text-primary-foreground/80 max-w-md">
+        Get direct access to flexible business financing with zero hard credit pulls to start.
+      </p>
+      <Button as="a" href="/solutions/apply" variant="secondary" class="h-11 px-8 text-sm font-medium mt-2">
+        Get Started
+      </Button>
+    </section>
+  </main>
+</Layout>

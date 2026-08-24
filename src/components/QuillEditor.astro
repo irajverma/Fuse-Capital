@@ -2,7 +2,8 @@
 import Tooltip from '@/components/ui/tooltip/tooltip.astro';
 import TooltipTrigger from '@/components/ui/tooltip/tooltip-trigger.astro';
 import TooltipContent from '@/components/ui/tooltip/tooltip-content.astro';
-import ChevronDown from '@lucide/astro/icons/chevron-down';
+import { Icon } from '@/components/ui/icon';
+
 
 import boldSvg from 'quill/assets/icons/bold.svg?raw';
 import italicSvg from 'quill/assets/icons/italic.svg?raw';
@@ -90,7 +91,7 @@ const hasActionsRow = !toolbarOpen || Astro.slots.has('actions');
       <div class="flex items-center gap-2 px-1.5 pb-1.5 whitespace-nowrap sm:self-end max-sm:w-full justify-end">
         {!toolbarOpen && (
           <button data-formatting-toggle class="inline-flex items-center gap-1 rounded-md text-muted-foreground text-xs font-medium h-8 px-3 hover:bg-secondary-foreground/10 transition-colors">
-            Formatting <ChevronDown data-formatting-chevron size={13} class="transition-transform duration-200" />
+            Formatting <Icon name="chevron-down" data-formatting-chevron class="size-3.5 transition-transform duration-200" />
           </button>
         )}
         <slot name="actions" />

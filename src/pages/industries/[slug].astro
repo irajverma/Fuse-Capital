@@ -1,0 +1,315 @@
+---
+export const prerender = true;
+
+import Layout from '../../layouts/Layout.astro';
+import { Button } from '@/components/ui/button';
+import { Icon } from '@/components/ui/icon';
+import Calculator from '@/components/Calculator.astro';
+import IndustryIcon from '@/components/IndustryIcon.astro';
+import {
+  Accordion,
+  AccordionItem,
+  AccordionTrigger,
+  AccordionContent,
+} from '@/components/ui/accordion';
+import {
+  industryCategories,
+  categoryIconColor,
+  categoryDotColor,
+  type Industry,
+  type IndustryCategoryColor,
+} from '@/data/industries';
+import { getIndustryDetails } from '@/data/industry-details';
+
+export async function getStaticPaths() {
+  const paths = [];
+
+  // Individual industry item routes
+  for (const cat of industryCategories) {
+    for (const item of cat.items) {
+      paths.push({
+        params: { slug: item.slug },
+        props: { item, categoryKey: cat.key, color: cat.color },
+      });
+    }
+  }
+
+  // Category alias routes requested by user
+  const categoryAliases: { slug: string; name: string; categoryKey: string; color: IndustryCategoryColor; iconItem: Industry }[] = [
+    {
+      slug: 'hospitality-healthcare',
+      name: 'Hospitality & Healthcare',
+      categoryKey: 'health',
+      color: 'emerald',
+      iconItem: { name: 'Hospitality & Healthcare', slug: 'hospitality-healthcare', paths: ['M19 14c1.5-1.5 3-3.2 3-5.5A4.5 4.5 0 0 0 12 5 4.5 4.5 0 0 0 2 8.5c0 2.3 1.5 4 3 5.5l7 7z', 'M3.5 12h3l1.5-3 2 5 1.5-3h3'] },
+    },
+    {
+      slug: 'logistics-transportation',
+      name: 'Logistics & Transportation',
+      categoryKey: 'transport',
+      color: 'blue',
+      iconItem: { name: 'Logistics & Transportation', slug: 'logistics-transportation', paths: ['M3 7h11v9H3z', 'M14 10h4l3 3v3h-7z'], circles: [{ cx: 7, cy: 18, r: 1.5 }, { cx: 17, cy: 18, r: 1.5 }] },
+    },
+    {
+      slug: 'retail',
+      name: 'Retail & E-Commerce',
+      categoryKey: 'retail',
+      color: 'violet',
+      iconItem: { name: 'Retail & E-Commerce', slug: 'retail', paths: ['M5 7h14l-1 13H6z', 'M9 7a3 3 0 0 1 6 0'] },
+    },
+    {
+      slug: 'trades',
+      name: 'Construction & Trades',
+      categoryKey: 'trades',
+      color: 'orange',
+      iconItem: { name: 'Construction & Trades', slug: 'trades', paths: ['M2 18a1 1 0 0 0 1 1h18a1 1 0 0 0 1-1v-1a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1z', 'M10 10V6a2 2 0 0 1 4 0v4'] },
+    },
+    {
+      slug: 'pro',
+      name: 'Professional Services',
+      categoryKey: 'pro',
+      color: 'indigo',
+      iconItem: { name: 'Professional Services', slug: 'pro', paths: ['M12 3v18', 'M7 21h10', 'M5 7h14'] },
+    },
+  ];
+
+  for (const alias of categoryAliases) {
+    paths.push({
+      params: { slug: alias.slug },
+      props: { item: alias.iconItem, categoryKey: alias.categoryKey, color: alias.color },
+    });
+  }
+
+  return paths;
+}
+
+interface Props {
+  item: Industry;
+  categoryKey: string;
+  color: IndustryCategoryColor;
+}
+
+const { item, categoryKey, color } = Astro.props;
+const details = getIndustryDetails(item.slug, item.name);
+
+// Related industries in the same category
+const currentCat = industryCategories.find((c) => c.key === categoryKey);
+const relatedIndustries = (currentCat?.items || []).filter((i) => i.slug !== item.slug).slice(0, 4);
+---
+
+<Layout
+  title={`${item.name} Business Funding | Funded Experts`}
+  description={details.heroDescription}
+>
+  <!-- Hero Section -->
+  <header class="relative overflow-hidden bg-background border-b border-border/60 py-16 sm:py-24 px-6">
+    <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+      <div class="lg:col-span-7 flex flex-col items-start gap-5">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-xs font-semibold uppercase tracking-wider text-primary">
+          <span class:list={['w-2 h-2 rounded-full', categoryDotColor[color]]}></span>
+          {details.heroTagline}
+        </div>
+        <h1 class="text-3xl sm:text-5xl font-light tracking-tight leading-tight text-foreground">
+          {details.heroHeadline}
+        </h1>
+        <p class="text-base sm:text-lg text-muted-foreground leading-relaxed max-w-2xl">
+          {details.heroDescription}
+        </p>
+
+        <div class="flex flex-wrap items-center gap-4 pt-2">
+          <Button as="a" href="/solutions/apply" class="gap-2 px-6 h-11 text-sm font-medium">
+            Apply for {item.name} Funding
+            <Icon name="arrow-right" class="size-4" />
+          </Button>
+          <a
+            href="#calculator"
+            class="inline-flex items-center gap-1.5 px-4 h-11 rounded-md text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Calculate qualification
+            <Icon name="chevron-down" class="size-4" />
+          </a>
+        </div>
+      </div>
+
+      <!-- Hero Graphic Card / US Coverage Card -->
+      <div class="lg:col-span-5 flex justify-center">
+        <div class="w-full max-w-md bg-card border border-border/80 rounded-2xl p-6 shadow-lg flex flex-col gap-6 relative overflow-hidden">
+          <div class:list={['absolute top-0 right-0 w-32 h-32 rounded-full blur-3xl opacity-20', categoryDotColor[color]]}></div>
+
+          <div class="flex items-center justify-between pb-4 border-b border-border/60">
+            <div class="flex items-center gap-3">
+              <span class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+                <IndustryIcon item={item} class={categoryIconColor[color]} />
+              </span>
+              <div>
+                <p class="text-sm font-semibold text-foreground">{item.name}</p>
+                <p class="text-xs text-muted-foreground">National Funding Program</p>
+              </div>
+            </div>
+            <span class="inline-flex items-center gap-1 text-xs font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full">
+              <Icon name="check" class="size-3" /> Active
+            </span>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div class="bg-secondary/60 rounded-xl p-3.5 border border-border/40">
+              <p class="text-xs text-muted-foreground uppercase tracking-wider">Fastest Deposit</p>
+              <p class="text-lg font-bold text-foreground mt-0.5">24 Hours</p>
+            </div>
+            <div class="bg-secondary/60 rounded-xl p-3.5 border border-border/40">
+              <p class="text-xs text-muted-foreground uppercase tracking-wider">Credit Pull</p>
+              <p class="text-lg font-bold text-emerald-600 dark:text-emerald-400 mt-0.5">No Impact</p>
+            </div>
+            <div class="bg-secondary/60 rounded-xl p-3.5 border border-border/40">
+              <p class="text-xs text-muted-foreground uppercase tracking-wider">Approval Rate</p>
+              <p class="text-lg font-bold text-foreground mt-0.5">8 out of 10</p>
+            </div>
+            <div class="bg-secondary/60 rounded-xl p-3.5 border border-border/40">
+              <p class="text-xs text-muted-foreground uppercase tracking-wider">Min. Deposits</p>
+              <p class="text-lg font-bold text-foreground mt-0.5">$10,000/mo</p>
+            </div>
+          </div>
+
+          <div class="pt-2 text-center border-t border-border/60">
+            <p class="text-xs text-muted-foreground">
+              ⚡ Over 80% of declined bank applicants qualify with us.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Key Metrics Row -->
+  <section class="bg-secondary/50 border-b border-border/60 py-10 px-6">
+    <div class="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+      <div class="flex flex-col items-center">
+        <p class="text-3xl sm:text-4xl font-bold tracking-tight text-foreground">{details.stat1Value}</p>
+        <p class="text-xs sm:text-sm text-muted-foreground mt-1 capitalize">{details.stat1Label}</p>
+      </div>
+      <div class="flex flex-col items-center">
+        <p class="text-3xl sm:text-4xl font-bold tracking-tight text-foreground">{details.stat2Value}</p>
+        <p class="text-xs sm:text-sm text-muted-foreground mt-1 capitalize">{details.stat2Label}</p>
+      </div>
+      <div class="flex flex-col items-center">
+        <p class="text-3xl sm:text-4xl font-bold tracking-tight text-foreground">{details.stat3Value}</p>
+        <p class="text-xs sm:text-sm text-muted-foreground mt-1 capitalize">{details.stat3Label}</p>
+      </div>
+      <div class="flex flex-col items-center">
+        <p class="text-3xl sm:text-4xl font-bold tracking-tight text-foreground">{details.stat4Value}</p>
+        <p class="text-xs sm:text-sm text-muted-foreground mt-1 capitalize">{details.stat4Label}</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Benefits Section ("What working with Funded Experts looks like") -->
+  <section class="py-16 sm:py-24 px-6 max-w-6xl mx-auto">
+    <div class="text-center max-w-3xl mx-auto mb-14">
+      <h2 class="text-2xl sm:text-4xl font-light tracking-tight text-foreground">
+        {details.benefitsTitle}
+      </h2>
+      <p class="text-muted-foreground mt-3 text-base">
+        Simple, transparent financing options tailored to your real cash flow.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+      {details.benefits.map((benefit) => (
+        <div class="flex gap-4 p-6 bg-card border border-border/80 rounded-2xl shadow-sm hover:border-primary/40 transition-colors">
+          <div class="w-10 h-10 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
+            <Icon name="check" class="size-5" />
+          </div>
+          <div>
+            <h3 class="text-lg font-semibold text-foreground mb-1">{benefit.title}</h3>
+            <p class="text-sm text-muted-foreground leading-relaxed">{benefit.description}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- Calculator Section -->
+  <section id="calculator" class="bg-secondary/40 py-16 sm:py-24 px-6 border-y border-border/60">
+    <div class="max-w-4xl mx-auto">
+      <div class="text-center max-w-2xl mx-auto mb-10">
+        <h2 class="text-2xl sm:text-4xl font-light tracking-tight text-foreground">
+          How much can your {item.name.toLowerCase()} business qualify for?
+        </h2>
+        <p class="text-muted-foreground mt-2 text-sm sm:text-base">
+          Quickly estimate your funding options. Simple math, instant results.
+        </p>
+      </div>
+
+      <Calculator />
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section class="py-16 sm:py-24 px-6 max-w-4xl mx-auto">
+    <div class="text-center mb-12">
+      <h2 class="text-2xl sm:text-4xl font-light tracking-tight text-foreground">
+        {item.name} Funding FAQs
+      </h2>
+      <p class="text-muted-foreground mt-2 text-sm">
+        Everything you need to know about qualifying and applying.
+      </p>
+    </div>
+
+    <Accordion collapsible class="w-full">
+      {details.faqs.map((faq, i) => (
+        <AccordionItem value={`faq-${i}`}>
+          <AccordionTrigger class="text-left text-base font-medium">
+            {faq.question}
+          </AccordionTrigger>
+          <AccordionContent class="text-sm text-muted-foreground leading-relaxed">
+            {faq.answer}
+          </AccordionContent>
+        </AccordionItem>
+      ))}
+    </Accordion>
+  </section>
+
+  <!-- Related Industries -->
+  {relatedIndustries.length > 0 && (
+    <section class="bg-secondary/30 py-16 px-6 border-t border-border/60">
+      <div class="max-w-6xl mx-auto">
+        <div class="flex items-center justify-between mb-8">
+          <div>
+            <h3 class="text-xl font-light text-foreground">Explore Related Industries</h3>
+            <p class="text-xs text-muted-foreground mt-1">Other trades and services we fund</p>
+          </div>
+          <a href="/industries" class="text-xs font-semibold text-primary hover:underline flex items-center gap-1">
+            View all industries <Icon name="arrow-right" class="size-3" />
+          </a>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+          {relatedIndustries.map((rel) => (
+            <a
+              href={`/industries/${rel.slug}`}
+              class="flex items-center gap-3 p-4 bg-card border border-border rounded-xl shadow-sm hover:border-primary/40 hover:-translate-y-0.5 transition"
+            >
+              <span class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                <IndustryIcon item={rel} class={categoryIconColor[color]} />
+              </span>
+              <span class="text-sm font-semibold text-foreground truncate">{rel.name}</span>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- Bottom CTA -->
+  <section class="bg-primary text-primary-foreground py-16 px-6 text-center">
+    <div class="max-w-2xl mx-auto flex flex-col items-center gap-4">
+      <h2 class="text-3xl font-light tracking-tight">Ready to finance your {item.name.toLowerCase()} business?</h2>
+      <p class="text-primary-foreground/80 text-sm max-w-md">
+        Take 5 minutes to complete our online application and receive decision offers within 24 hours.
+      </p>
+      <Button as="a" href="/solutions/apply" variant="secondary" class="mt-2 h-11 px-8 text-sm font-medium">
+        Apply Now
+      </Button>
+    </div>
+  </section>
+</Layout>

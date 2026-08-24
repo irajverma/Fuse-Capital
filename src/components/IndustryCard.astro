@@ -12,7 +12,7 @@ const { item, categoryKey, color } = Astro.props;
 ---
 
 <a
-  href="/solutions/apply"
+  href={`/industries/${item.slug}`}
   data-card
   data-name={item.name.toLowerCase()}
   data-cat={categoryKey}

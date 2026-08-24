@@ -1,6 +1,6 @@
 ---
 import { cn } from "@/lib/utils";
-import Sparkles from "@lucide/astro/icons/sparkles";
+import { Icon } from "@/components/ui/icon";
 
 interface Props {
   class?: string;
@@ -28,7 +28,7 @@ const {
 >
   <div>
     <span class="relative inline-block rounded-full bg-blue-800 p-1">
-      <Sparkles class="size-4 text-blue-300" />
+      <Icon name="sparkles" class="size-4 text-blue-300" />
     </span>
     <p class="text-lg font-medium text-blue-500">{title}</p>
   </div>

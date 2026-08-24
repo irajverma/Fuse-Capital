@@ -1,0 +1,139 @@
+---
+export const prerender = true;
+
+import Layout from '../layouts/Layout.astro';
+import { Button } from '@/components/ui/button';
+import { Icon } from '@/components/ui/icon';
+import IconStat from '@/components/IconStat.astro';
+
+const values = [
+  {
+    icon: 'shield-check',
+    title: 'Zero Broker Markup',
+    desc: 'We connect business owners directly to capital without hidden middleman fees or inflated factor rates.',
+  },
+  {
+    icon: 'clock',
+    title: 'Speed at Scale',
+    desc: 'Digital underwriting processes applications in minutes so capital is deposited within 24 hours.',
+  },
+  {
+    icon: 'thumbs-up',
+    title: 'Transparent Terms',
+    desc: 'Clear repayment terms, zero surprise fees, and dedicated human support from start to finish.',
+  },
+];
+
+const stats = [
+  { icon: 'calendar', label: 'In Business', value: '13+ Years' },
+  { icon: 'circle-dollar-sign', label: 'Volume Funded', value: '$89M+ Total' },
+  { icon: 'building-2', label: 'Businesses Funded', value: '4,000+' },
+];
+---
+
+<Layout
+  title="About Us | Funded Experts"
+  description="Learn about Funded Experts, our mission to simplify business financing, and our transparent, direct-to-borrower approach."
+>
+  <header class="bg-background border-b border-border/60 py-16 sm:py-24 px-6 text-center">
+    <div class="max-w-3xl mx-auto flex flex-col items-center gap-4">
+      <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-primary/10 border border-primary/20 text-xs font-semibold uppercase tracking-wider text-primary">
+        <Icon name="building-2" class="size-3.5" />
+        About Funded Experts
+      </div>
+      <h1 class="text-3xl sm:text-5xl font-light tracking-tight text-foreground">
+        Empowering American Small Businesses to Grow
+      </h1>
+      <p class="text-base sm:text-lg text-muted-foreground max-w-xl">
+        We bridge cash flow gaps with fast, transparent, and accessible business financing—without traditional bank delays.
+      </p>
+    </div>
+  </header>
+
+  <main class="py-16 px-6 max-w-5xl mx-auto space-y-20">
+    <!-- Our Mission Section -->
+    <section class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+      <div class="space-y-4">
+        <h2 class="text-2xl sm:text-3xl font-light tracking-tight text-foreground">
+          Why We Built Funded Experts
+        </h2>
+        <p class="text-sm text-muted-foreground leading-relaxed">
+          Traditional banks turn down over 80% of small business loan applicants due to rigid collateral rules, slow 60-day review cycles, and legacy paperwork.
+        </p>
+        <p class="text-sm text-muted-foreground leading-relaxed">
+          At Funded Experts, we evaluate real cash flow—your actual gross bank deposits—to deliver decisions in minutes and deposits in as fast as 24 hours.
+        </p>
+      </div>
+
+      <div class="bg-card border border-border rounded-2xl p-8 space-y-6 shadow-sm">
+        <h3 class="text-xl font-semibold text-foreground">Our Core Promise</h3>
+        <ul class="space-y-3 text-sm text-muted-foreground">
+          <li class="flex items-start gap-2.5">
+            <Icon name="check" class="size-4 text-emerald-500 shrink-0 mt-0.5" />
+            <span><strong>No hard credit pull to apply:</strong> Check qualification options risk-free.</span>
+          </li>
+          <li class="flex items-start gap-2.5">
+            <Icon name="check" class="size-4 text-emerald-500 shrink-0 mt-0.5" />
+            <span><strong>Direct lender network:</strong> Cut out broker markups and retain maximum capital.</span>
+          </li>
+          <li class="flex items-start gap-2.5">
+            <Icon name="check" class="size-4 text-emerald-500 shrink-0 mt-0.5" />
+            <span><strong>High approval rates:</strong> 8 out of 10 applicants who were turned down by banks qualify with us.</span>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Company Values -->
+    <section class="space-y-10">
+      <div class="text-center max-w-2xl mx-auto">
+        <h2 class="text-2xl sm:text-3xl font-light tracking-tight text-foreground">
+          Our Principles
+        </h2>
+        <p class="text-sm text-muted-foreground mt-2">
+          How we operate every single day to serve business owners.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {values.map((v) => (
+          <div class="bg-card border border-border rounded-2xl p-6 flex flex-col gap-3">
+            <div class="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+              <Icon name="star" class="size-5" />
+            </div>
+            <h3 class="text-base font-semibold text-foreground">{v.title}</h3>
+            <p class="text-xs text-muted-foreground leading-relaxed">{v.desc}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- Trust Stats -->
+    <section class="bg-secondary/40 border border-border rounded-2xl p-10">
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 text-center">
+        {stats.map((s) => (
+          <IconStat
+            icon={s.icon}
+            label={s.label}
+            value={s.value}
+            iconBg="bg-primary/15"
+            iconColor="text-primary"
+            labelColor="text-muted-foreground"
+            valueColor="text-foreground"
+          />
+        ))}
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="bg-primary text-primary-foreground rounded-2xl p-10 text-center flex flex-col items-center gap-4">
+      <h2 class="text-2xl sm:text-3xl font-light">Ready to fuel your business growth?</h2>
+      <p class="text-sm text-primary-foreground/80 max-w-md">
+        Take 5 minutes to complete our online application and receive decision offers within 24 hours.
+      </p>
+      <Button as="a" href="/solutions/apply" variant="secondary" class="h-11 px-8 text-sm font-medium mt-2">
+        Apply Now
+      </Button>
+    </section>
+  </main>
+</Layout>

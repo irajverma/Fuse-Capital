@@ -43,7 +43,7 @@ const industries = industryCategories
             <InputGroupAddon align="inline-start">
                 <InputGroupText>$</InputGroupText>
             </InputGroupAddon>
-            <InputGroupInput type="text" inputmode="numeric" aria-label="Monthly revenue" data-format-number data-max="200000" data-max-plus data-connects="revenue" placeholder="" class="py-1.5" />
+            <InputGroupInput type="text" inputmode="numeric" aria-label="Monthly revenue" data-format-number data-max="200000" data-max-plus data-connects="revenue" value="100,000" placeholder="100,000" class="py-1.5" />
         </InputGroup>
         <Slider
         defaultValue={100000}
@@ -57,7 +57,7 @@ const industries = industryCategories
     </div>
     <div class="flex flex-col gap-3 md:col-start-1 md:row-start-2">
         <p>Credit score</p>
-        <Input type="text" inputmode="numeric" aria-label="Credit score" data-format-number data-max="850" data-connects="credit" maxlength="3" class="w-full" placeholder="" />
+        <Input type="text" inputmode="numeric" aria-label="Credit score" data-format-number data-max="850" data-connects="credit" maxlength="3" value="650" placeholder="650" class="w-full" />
         <Slider
         defaultValue={650}
         max={850}
@@ -236,6 +236,11 @@ const industries = industryCategories
 
       // Slider → Input: update and format when slider moves
       const sliderMax = slider.dataset.max ? Number(slider.dataset.max) : null;
+      const sliderDefault = slider.dataset.defaultValue ? Number(slider.dataset.defaultValue) : null;
+      if (!input.value && sliderDefault !== null) {
+        const suffix = 'maxPlus' in input.dataset && sliderMax !== null && sliderDefault >= sliderMax ? '+' : '';
+        input.value = sliderDefault.toLocaleString('en-US') + suffix;
+      }
       slider.addEventListener('slider:change', (e: Event) => {
         const value = (e as CustomEvent).detail?.value;
         if (typeof value === 'number') {
@@ -265,23 +270,18 @@ const industries = industryCategories
     const calcBtn = card.querySelector<HTMLElement>('[data-calculate]')!;
 
     const resetForm = () => {
-      // Clear number inputs and validation state
+      // Clear validation state
       form.querySelectorAll<HTMLInputElement>('[data-format-number]').forEach(input => {
-        input.value = '';
         input.removeAttribute('aria-invalid');
       });
       form.querySelector<HTMLElement>('[data-slot="combobox-input"]')?.removeAttribute('aria-invalid');
       form.querySelectorAll<HTMLElement>('[data-slot="radio-group"]').forEach(g => setGroupInvalid(g, false));
 
-      // Reset sliders to defaults, then clear inputs (slider:set fires slider:change which writes to input)
+      // Reset sliders to defaults (slider:set fires slider:change which updates input values)
       const revenueSlider = form.querySelector<HTMLElement>('[data-slot="slider"][data-connects="revenue"]');
       const creditSlider  = form.querySelector<HTMLElement>('[data-slot="slider"][data-connects="credit"]');
       revenueSlider?.dispatchEvent(new CustomEvent('slider:set', { detail: { value: 100000 } }));
       creditSlider?.dispatchEvent(new CustomEvent('slider:set',  { detail: { value: 650 } }));
-      // Wipe the inputs again since slider:change will have re-populated them
-      form.querySelectorAll<HTMLInputElement>('[data-format-number]').forEach(input => {
-        input.value = '';
-      });
 
       // Clear combobox
       const comboboxRoot = form.querySelector<HTMLElement>('[data-slot="combobox"]');

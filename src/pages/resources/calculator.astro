@@ -1,0 +1,125 @@
+---
+export const prerender = true;
+
+import Layout from '../../layouts/Layout.astro';
+import Calculator from '@/components/Calculator.astro';
+import { Button } from '@/components/ui/button';
+import { Icon } from '@/components/ui/icon';
+import {
+  Accordion,
+  AccordionItem,
+  AccordionTrigger,
+  AccordionContent,
+} from '@/components/ui/accordion';
+
+const calculatorFaqs = [
+  {
+    question: 'How accurate is this loan calculator?',
+    answer: 'The calculator provides estimated qualification amounts based on real funded deal parameters across our lender network. Final offers depend on bank statement verification and underwriting approval.',
+  },
+  {
+    question: 'Does running this estimate affect my credit score?',
+    answer: 'No. Modeling scenarios and checking your options on Funded Experts involves zero hard credit pulls and will never impact your credit score.',
+  },
+  {
+    question: 'What factors determine my max funding amount?',
+    answer: 'The primary factors are your business\'s average monthly bank deposits, time in business, credit profile, and industry category.',
+  },
+];
+---
+
+<Layout
+  title="Business Loan Calculator | Funded Experts"
+  description="Model business loan payments, rates, and qualification scenarios instantly with our interactive financing calculator."
+>
+  <header class="bg-background border-b border-border/60 py-16 sm:py-20 px-6 text-center">
+    <div class="max-w-3xl mx-auto flex flex-col items-center gap-4">
+      <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-primary/10 border border-primary/20 text-xs font-semibold uppercase tracking-wider text-primary">
+        <Icon name="sparkles" class="size-3.5" />
+        Interactive Financing Model
+      </div>
+      <h1 class="text-3xl sm:text-5xl font-light tracking-tight text-foreground">
+        Business Loan & Qualification Calculator
+      </h1>
+      <p class="text-base sm:text-lg text-muted-foreground max-w-xl">
+        Estimate how much funding your business can qualify for in seconds based on your monthly revenue and credit profile.
+      </p>
+    </div>
+  </header>
+
+  <main class="py-14 sm:py-20 px-6 max-w-4xl mx-auto">
+    <div class="mb-14">
+      <Calculator />
+    </div>
+
+    <!-- How it works section -->
+    <section class="py-10 border-t border-border/60">
+      <h2 class="text-2xl font-light tracking-tight text-foreground text-center mb-10">
+        How Our AI Qualification Engine Works
+      </h2>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-card border border-border rounded-xl p-6 flex flex-col gap-3">
+          <div class="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center font-bold text-lg">
+            1
+          </div>
+          <h3 class="text-base font-semibold text-foreground">Analyze Bank Deposits</h3>
+          <p class="text-xs text-muted-foreground leading-relaxed">
+            Revenue-based funding evaluates gross monthly bank deposits rather than relying heavily on hard assets or collateral.
+          </p>
+        </div>
+
+        <div class="bg-card border border-border rounded-xl p-6 flex flex-col gap-3">
+          <div class="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center font-bold text-lg">
+            2
+          </div>
+          <h3 class="text-base font-semibold text-foreground">Match Products</h3>
+          <p class="text-xs text-muted-foreground leading-relaxed">
+            Our algorithm maps your profile against merchant cash advances, lines of credit, and term loans across 30+ digital lenders.
+          </p>
+        </div>
+
+        <div class="bg-card border border-border rounded-xl p-6 flex flex-col gap-3">
+          <div class="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center font-bold text-lg">
+            3
+          </div>
+          <h3 class="text-base font-semibold text-foreground">Instant Offer Estimate</h3>
+          <p class="text-xs text-muted-foreground leading-relaxed">
+            View estimated funding amounts and terms instantly without obligation or hard credit impact.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Calculator FAQs -->
+    <section class="pt-10 border-t border-border/60">
+      <h2 class="text-2xl font-light tracking-tight text-foreground text-center mb-8">
+        Calculator FAQs
+      </h2>
+
+      <Accordion collapsible class="w-full max-w-2xl mx-auto">
+        {calculatorFaqs.map((faq, i) => (
+          <AccordionItem value={`faq-${i}`}>
+            <AccordionTrigger class="text-left text-base font-medium">
+              {faq.question}
+            </AccordionTrigger>
+            <AccordionContent class="text-sm text-muted-foreground leading-relaxed">
+              {faq.answer}
+            </AccordionContent>
+          </AccordionItem>
+        ))}
+      </Accordion>
+    </section>
+
+    <!-- Call to action -->
+    <div class="mt-16 bg-primary text-primary-foreground rounded-2xl p-8 text-center flex flex-col items-center gap-4">
+      <h3 class="text-2xl font-light">Ready to turn your estimate into a funded offer?</h3>
+      <p class="text-sm text-primary-foreground/80 max-w-md">
+        Submit a 5-minute online application to receive official lender offers within 24 hours.
+      </p>
+      <Button as="a" href="/solutions/apply" variant="secondary" class="h-10 px-6 text-sm font-medium">
+        Apply Now
+      </Button>
+    </div>
+  </main>
+</Layout>

@@ -1,0 +1,79 @@
+---
+export const prerender = true;
+
+import Layout from '../../layouts/Layout.astro';
+import { Button } from '@/components/ui/button';
+import { Icon } from '@/components/ui/icon';
+
+const steps = [
+  {
+    step: '01',
+    title: 'Bank Statement Analysis',
+    desc: 'Our digital underwriting platform securely reviews your last 3–4 months of business bank deposits to understand cash flow cycles.',
+  },
+  {
+    step: '02',
+    title: 'Custom Term Structuring',
+    desc: 'We match your revenue frequency with daily, weekly, or monthly repayment schedules that protect your operational liquidity.',
+  },
+  {
+    step: '03',
+    title: 'Multi-Offer Comparison',
+    desc: 'Compare term loans, lines of credit, and revenue-based positions side-by-side to choose the structure that best fits your goals.',
+  },
+  {
+    step: '04',
+    title: 'Same-Day Wire Funding',
+    desc: 'Once you select an offer and sign documents digitally, funds are wired directly into your business bank account within 24 hours.',
+  },
+];
+---
+
+<Layout
+  title="Personalized Financing Plan | Funded Experts"
+  description="Work with our underwriting team to structure a personalized business financing plan tailored to your operational cash flows."
+>
+  <header class="bg-background border-b border-border/60 py-16 sm:py-24 px-6 text-center">
+    <div class="max-w-3xl mx-auto flex flex-col items-center gap-4">
+      <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-primary/10 border border-primary/20 text-xs font-semibold uppercase tracking-wider text-primary">
+        <Icon name="star" class="size-3.5 text-primary" />
+        Tailored Business Solutions
+      </div>
+      <h1 class="text-3xl sm:text-5xl font-light tracking-tight text-foreground">
+        Personalized Business Financing Plan
+      </h1>
+      <p class="text-base sm:text-lg text-muted-foreground max-w-xl">
+        Every business has a unique cash flow cycle. We structure customized funding terms that fit your revenue patterns.
+      </p>
+    </div>
+  </header>
+
+  <main class="py-16 px-6 max-w-5xl mx-auto space-y-16">
+    <!-- 4 Step Process Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+      {steps.map((s) => (
+        <div class="bg-card border border-border rounded-2xl p-8 flex flex-col gap-4 shadow-sm">
+          <div class="flex items-center justify-between">
+            <span class="text-3xl font-bold text-primary">{s.step}</span>
+            <span class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+              <Icon name="check" class="size-4" />
+            </span>
+          </div>
+          <h3 class="text-xl font-semibold text-foreground">{s.title}</h3>
+          <p class="text-sm text-muted-foreground leading-relaxed">{s.desc}</p>
+        </div>
+      ))}
+    </div>
+
+    <!-- CTA -->
+    <div class="bg-primary text-primary-foreground rounded-2xl p-10 text-center flex flex-col items-center gap-4">
+      <h2 class="text-2xl sm:text-3xl font-light">Build your personalized plan today</h2>
+      <p class="text-sm text-primary-foreground/80 max-w-md">
+        Take 5 minutes to submit your basic details. Zero hard credit pull to view your custom financing options.
+      </p>
+      <Button as="a" href="/solutions/apply" variant="secondary" class="h-11 px-8 text-sm font-medium mt-2">
+        Apply Now
+      </Button>
+    </div>
+  </main>
+</Layout>

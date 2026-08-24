@@ -7,19 +7,19 @@
 		"node": ">=22.12.0",
 		"pnpm": ">=10.25"
 	},
-	"scripts": {
-		"dev-vars": "node scripts/dev-vars.mjs",
-		"dev": "node scripts/dev-vars.mjs --watch -- astro dev",
-		"dev:wrangler": "pnpm dev-vars && astro build && node scripts/dev-vars.mjs --watch -- wrangler dev",
-		"build": "astro build",
-		"preview": "astro build && wrangler dev --port 8788",
-		"deploy:prod": "node scripts/deploy.mjs",
-		"deploy:dry": "node scripts/deploy.mjs --dry-run",
-		"astro": "astro",
-		"test": "vitest run",
-		"test:watch": "vitest",
-		"cf-typegen": "wrangler types"
-	},
+"scripts": {
+        "dev-vars": "node scripts/dev-vars.mjs",
+        "dev": "node scripts/dev-vars.mjs --watch -- astro dev",
+        "dev:wrangler": "pnpm dev-vars && astro build && node scripts/dev-vars.mjs --watch -- wrangler dev",
+        "build": "astro build",
+        "preview": "astro build && wrangler dev --port 8788",
+        "deploy:prod": "node scripts/deploy.mjs",
+        "deploy:dry": "node scripts/deploy.mjs --dry-run",
+        "astro": "astro",
+        "test": "vitest run",
+        "test:watch": "vitest",
+        "cf-typegen": "wrangler types"
+    },
 	"dependencies": {
 		"@astrojs/cloudflare": "^13.7.0",
 		"@astrojs/mdx": "^6.0.3",
@@ -36,7 +36,6 @@
 		"@data-slot/tabs": "^0.2.166",
 		"@data-slot/tooltip": "^0.2.166",
 		"@fontsource-variable/geist": "^5.2.9",
-		"@lucide/astro": "^1.20.0",
 		"@tailwindcss/vite": "^4.3.1",
 		"@types/node": "^26.0.0",
 		"astro": "^6.4.6",

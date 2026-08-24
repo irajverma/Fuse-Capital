@@ -1,0 +1,31 @@
+---
+export const prerender = true;
+
+import Layout from '../../layouts/Layout.astro';
+import Calculator from '@/components/Calculator.astro';
+import { Icon } from '@/components/ui/icon';
+---
+
+<Layout
+  title="Quick Estimate | Funded Experts"
+  description="Get an immediate 1-minute qualification estimate based on your monthly revenue and credit profile."
+>
+  <header class="bg-background border-b border-border/60 py-16 sm:py-20 px-6 text-center">
+    <div class="max-w-3xl mx-auto flex flex-col items-center gap-4">
+      <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-primary/10 border border-primary/20 text-xs font-semibold uppercase tracking-wider text-primary">
+        <Icon name="clock" class="size-3.5 text-primary" />
+        1-Minute Online Estimation
+      </div>
+      <h1 class="text-3xl sm:text-5xl font-light tracking-tight text-foreground">
+        Quick Business Qualification Estimate
+      </h1>
+      <p class="text-base sm:text-lg text-muted-foreground max-w-xl">
+        Enter your key business metrics below for an instant preliminary funding assessment. Zero impact on your credit score.
+      </p>
+    </div>
+  </header>
+
+  <main class="py-14 px-6 max-w-4xl mx-auto">
+    <Calculator />
+  </main>
+</Layout>
