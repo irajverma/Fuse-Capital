@@ -6,6 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
 import Calculator from '@/components/Calculator.astro';
 import IndustryIcon from '@/components/IndustryIcon.astro';
+import { getImage } from 'astro:assets';
+import { getIndustryImage } from '@/data/industry-images';
 import {
   Accordion,
   AccordionItem,
@@ -95,6 +97,9 @@ const details = getIndustryDetails(item.slug, item.name);
 // Related industries in the same category
 const currentCat = industryCategories.find((c) => c.key === categoryKey);
 const relatedIndustries = (currentCat?.items || []).filter((i) => i.slug !== item.slug).slice(0, 4);
+
+const categoryHero = getIndustryImage(item.slug, categoryKey);
+const optimizedHeroBg = await getImage({ src: categoryHero, format: 'webp' });
 ---
 
 <Layout
@@ -102,141 +107,136 @@ const relatedIndustries = (currentCat?.items || []).filter((i) => i.slug !== ite
   description={details.heroDescription}
 >
   <!-- Hero Section -->
-  <header class="relative overflow-hidden bg-background border-b border-border/60 py-16 sm:py-24 px-6">
-    <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+  <header
+    class="hero-banner relative border-b border-border/60 py-16 sm:py-20 px-6 bg-cover bg-center"
+    style={`--hero-img: url('${optimizedHeroBg.src}')`}
+  >
+    <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
       <div class="lg:col-span-7 flex flex-col items-start gap-5">
-        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-xs font-semibold uppercase tracking-wider text-primary">
-          <span class:list={['w-2 h-2 rounded-full', categoryDotColor[color]]}></span>
+        <div class="text-sm font-semibold tracking-wide text-sky-700 dark:text-sky-400 uppercase">
           {details.heroTagline}
         </div>
-        <h1 class="text-3xl sm:text-5xl font-light tracking-tight leading-tight text-foreground">
+
+        <h1 class="text-3xl sm:text-5xl font-light tracking-tight leading-tight text-slate-900 dark:text-white">
           {details.heroHeadline}
         </h1>
-        <p class="text-base sm:text-lg text-muted-foreground leading-relaxed max-w-2xl">
+
+        <p class="text-base sm:text-lg text-slate-600 dark:text-slate-300 leading-relaxed max-w-2xl">
           {details.heroDescription}
         </p>
 
         <div class="flex flex-wrap items-center gap-4 pt-2">
           <Button as="a" href="/solutions/apply" class="gap-2 px-6 h-11 text-sm font-medium">
             Apply for {item.name} Funding
-            <Icon name="arrow-right" class="size-4" />
           </Button>
           <a
             href="#calculator"
-            class="inline-flex items-center gap-1.5 px-4 h-11 rounded-md text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+            class="inline-flex items-center gap-1.5 px-4 h-11 rounded-md text-sm font-medium text-slate-700 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white transition-colors"
           >
-            Calculate qualification
-            <Icon name="chevron-down" class="size-4" />
+            Calculate qualification ↓
           </a>
         </div>
       </div>
 
-      <!-- Hero Graphic Card / US Coverage Card -->
-      <div class="lg:col-span-5 flex justify-center">
-        <div class="w-full max-w-md bg-card border border-border/80 rounded-2xl p-6 shadow-lg flex flex-col gap-6 relative overflow-hidden">
-          <div class:list={['absolute top-0 right-0 w-32 h-32 rounded-full blur-3xl opacity-20', categoryDotColor[color]]}></div>
-
+      <!-- Hero Program Specification Card -->
+      <div class="lg:col-span-5 w-full">
+        <div class="bg-card/95 backdrop-blur-xs border border-border p-6 rounded-xl shadow-xs flex flex-col gap-5">
           <div class="flex items-center justify-between pb-4 border-b border-border/60">
             <div class="flex items-center gap-3">
-              <span class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+              <div class="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center shrink-0 border border-border/50">
                 <IndustryIcon item={item} class={categoryIconColor[color]} />
-              </span>
+              </div>
               <div>
-                <p class="text-sm font-semibold text-foreground">{item.name}</p>
-                <p class="text-xs text-muted-foreground">National Funding Program</p>
+                <p class="text-sm font-bold text-foreground">{item.name}</p>
+                <p class="text-xs font-mono text-muted-foreground">National Funding Spec</p>
               </div>
             </div>
-            <span class="inline-flex items-center gap-1 text-xs font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full">
-              <Icon name="check" class="size-3" /> Active
+            <span class="inline-flex items-center text-xs font-mono font-medium text-emerald-600 dark:text-emerald-400">
+              Active Underwriting
             </span>
           </div>
 
-          <div class="grid grid-cols-2 gap-4">
-            <div class="bg-secondary/60 rounded-xl p-3.5 border border-border/40">
-              <p class="text-xs text-muted-foreground uppercase tracking-wider">Fastest Deposit</p>
-              <p class="text-lg font-bold text-foreground mt-0.5">24 Hours</p>
+          <div class="grid grid-cols-2 gap-3">
+            <div class="bg-secondary/40 rounded-lg p-3 border border-border/50 font-mono">
+              <span class="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block">Decision Speed</span>
+              <span class="text-base font-bold text-foreground mt-0.5 block tabular-nums">Same-Day / 24h</span>
             </div>
-            <div class="bg-secondary/60 rounded-xl p-3.5 border border-border/40">
-              <p class="text-xs text-muted-foreground uppercase tracking-wider">Credit Pull</p>
-              <p class="text-lg font-bold text-emerald-600 dark:text-emerald-400 mt-0.5">No Impact</p>
+            <div class="bg-secondary/40 rounded-lg p-3 border border-border/50 font-mono">
+              <span class="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block">Hard Credit Pull</span>
+              <span class="text-base font-bold text-emerald-600 dark:text-emerald-400 mt-0.5 block">None Required</span>
             </div>
-            <div class="bg-secondary/60 rounded-xl p-3.5 border border-border/40">
-              <p class="text-xs text-muted-foreground uppercase tracking-wider">Approval Rate</p>
-              <p class="text-lg font-bold text-foreground mt-0.5">8 out of 10</p>
+            <div class="bg-secondary/40 rounded-lg p-3 border border-border/50 font-mono">
+              <span class="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block">Approval Ratio</span>
+              <span class="text-base font-bold text-foreground mt-0.5 block tabular-nums">80%+ Qualified</span>
             </div>
-            <div class="bg-secondary/60 rounded-xl p-3.5 border border-border/40">
-              <p class="text-xs text-muted-foreground uppercase tracking-wider">Min. Deposits</p>
-              <p class="text-lg font-bold text-foreground mt-0.5">$10,000/mo</p>
+            <div class="bg-secondary/40 rounded-lg p-3 border border-border/50 font-mono">
+              <span class="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block">Min. Deposits</span>
+              <span class="text-base font-bold text-foreground mt-0.5 block tabular-nums">$10k / Month</span>
             </div>
           </div>
 
-          <div class="pt-2 text-center border-t border-border/60">
-            <p class="text-xs text-muted-foreground">
-              ⚡ Over 80% of declined bank applicants qualify with us.
-            </p>
+          <div class="pt-2 text-xs text-muted-foreground text-center border-t border-border/60">
+            Decisions based on bank deposit history rather than strict personal credit scores.
           </div>
         </div>
       </div>
     </div>
   </header>
 
-  <!-- Key Metrics Row -->
-  <section class="bg-secondary/50 border-b border-border/60 py-10 px-6">
-    <div class="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-      <div class="flex flex-col items-center">
-        <p class="text-3xl sm:text-4xl font-bold tracking-tight text-foreground">{details.stat1Value}</p>
-        <p class="text-xs sm:text-sm text-muted-foreground mt-1 capitalize">{details.stat1Label}</p>
+  <!-- Key Parameters Row -->
+  <section class="bg-secondary/40 border-b border-border/60 py-10 px-6 font-mono">
+    <div class="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6">
+      <div class="p-4 bg-card border border-border/70 rounded-xl">
+        <span class="text-xs font-semibold uppercase tracking-wider text-muted-foreground block">{details.stat1Label}</span>
+        <p class="text-2xl sm:text-3xl font-bold tracking-tight text-foreground mt-1 tabular-nums">{details.stat1Value}</p>
       </div>
-      <div class="flex flex-col items-center">
-        <p class="text-3xl sm:text-4xl font-bold tracking-tight text-foreground">{details.stat2Value}</p>
-        <p class="text-xs sm:text-sm text-muted-foreground mt-1 capitalize">{details.stat2Label}</p>
+      <div class="p-4 bg-card border border-border/70 rounded-xl">
+        <span class="text-xs font-semibold uppercase tracking-wider text-muted-foreground block">{details.stat2Label}</span>
+        <p class="text-2xl sm:text-3xl font-bold tracking-tight text-foreground mt-1 tabular-nums">{details.stat2Value}</p>
       </div>
-      <div class="flex flex-col items-center">
-        <p class="text-3xl sm:text-4xl font-bold tracking-tight text-foreground">{details.stat3Value}</p>
-        <p class="text-xs sm:text-sm text-muted-foreground mt-1 capitalize">{details.stat3Label}</p>
+      <div class="p-4 bg-card border border-border/70 rounded-xl">
+        <span class="text-xs font-semibold uppercase tracking-wider text-muted-foreground block">{details.stat3Label}</span>
+        <p class="text-2xl sm:text-3xl font-bold tracking-tight text-foreground mt-1 tabular-nums">{details.stat3Value}</p>
       </div>
-      <div class="flex flex-col items-center">
-        <p class="text-3xl sm:text-4xl font-bold tracking-tight text-foreground">{details.stat4Value}</p>
-        <p class="text-xs sm:text-sm text-muted-foreground mt-1 capitalize">{details.stat4Label}</p>
+      <div class="p-4 bg-card border border-border/70 rounded-xl">
+        <span class="text-xs font-semibold uppercase tracking-wider text-muted-foreground block">{details.stat4Label}</span>
+        <p class="text-2xl sm:text-3xl font-bold tracking-tight text-foreground mt-1 tabular-nums">{details.stat4Value}</p>
       </div>
     </div>
   </section>
 
-  <!-- Benefits Section ("What working with Funded Experts looks like") -->
-  <section class="py-16 sm:py-24 px-6 max-w-6xl mx-auto">
-    <div class="text-center max-w-3xl mx-auto mb-14">
-      <h2 class="text-2xl sm:text-4xl font-light tracking-tight text-foreground">
+  <!-- Benefits Section -->
+  <section class="py-16 sm:py-20 px-6 max-w-6xl mx-auto">
+    <div class="max-w-3xl mb-12">
+      <span class="text-sm font-semibold tracking-wide text-sky-600 dark:text-sky-400 uppercase">Program Overview</span>
+      <h2 class="text-2xl sm:text-4xl font-light tracking-tight text-foreground mt-1">
         {details.benefitsTitle}
       </h2>
-      <p class="text-muted-foreground mt-3 text-base">
-        Simple, transparent financing options tailored to your real cash flow.
+      <p class="text-muted-foreground mt-2 text-base">
+        Capital structures calibrated to your operating realities and revenue cadence.
       </p>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       {details.benefits.map((benefit) => (
-        <div class="flex gap-4 p-6 bg-card border border-border/80 rounded-2xl shadow-sm hover:border-primary/40 transition-colors">
-          <div class="w-10 h-10 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
-            <Icon name="check" class="size-5" />
-          </div>
-          <div>
-            <h3 class="text-lg font-semibold text-foreground mb-1">{benefit.title}</h3>
-            <p class="text-sm text-muted-foreground leading-relaxed">{benefit.description}</p>
-          </div>
+        <div class="p-6 bg-card border border-border/80 rounded-xl">
+          <h3 class="text-base font-semibold text-foreground mb-1">{benefit.title}</h3>
+          <p class="text-sm text-muted-foreground leading-relaxed">{benefit.description}</p>
         </div>
       ))}
     </div>
   </section>
 
   <!-- Calculator Section -->
-  <section id="calculator" class="bg-secondary/40 py-16 sm:py-24 px-6 border-y border-border/60">
+  <section id="calculator" class="bg-secondary/30 py-16 sm:py-20 px-6 border-y border-border/60">
     <div class="max-w-4xl mx-auto">
       <div class="text-center max-w-2xl mx-auto mb-10">
-        <h2 class="text-2xl sm:text-4xl font-light tracking-tight text-foreground">
-          How much can your {item.name.toLowerCase()} business qualify for?
+        <span class="text-sm font-semibold tracking-wide text-sky-600 dark:text-sky-400 uppercase">Qualifications Estimator</span>
+        <h2 class="text-2xl sm:text-4xl font-light tracking-tight text-foreground mt-1">
+          Estimate capital capacity for {item.name.toLowerCase()}
         </h2>
         <p class="text-muted-foreground mt-2 text-sm sm:text-base">
-          Quickly estimate your funding options. Simple math, instant results.
+          Adjust monthly deposit figures to view potential advance amounts and terms.
         </p>
       </div>
 
@@ -245,14 +245,12 @@ const relatedIndustries = (currentCat?.items || []).filter((i) => i.slug !== ite
   </section>
 
   <!-- FAQ Section -->
-  <section class="py-16 sm:py-24 px-6 max-w-4xl mx-auto">
-    <div class="text-center mb-12">
-      <h2 class="text-2xl sm:text-4xl font-light tracking-tight text-foreground">
-        {item.name} Funding FAQs
+  <section class="py-16 sm:py-20 px-6 max-w-4xl mx-auto">
+    <div class="mb-10">
+      <span class="text-sm font-semibold tracking-wide text-sky-600 dark:text-sky-400 uppercase">Common Questions</span>
+      <h2 class="text-2xl sm:text-4xl font-light tracking-tight text-foreground mt-1">
+        {item.name} Program Details & FAQ
       </h2>
-      <p class="text-muted-foreground mt-2 text-sm">
-        Everything you need to know about qualifying and applying.
-      </p>
     </div>
 
     <Accordion collapsible class="w-full">
@@ -271,15 +269,15 @@ const relatedIndustries = (currentCat?.items || []).filter((i) => i.slug !== ite
 
   <!-- Related Industries -->
   {relatedIndustries.length > 0 && (
-    <section class="bg-secondary/30 py-16 px-6 border-t border-border/60">
+    <section class="bg-secondary/20 py-14 px-6 border-t border-border/60">
       <div class="max-w-6xl mx-auto">
         <div class="flex items-center justify-between mb-8">
           <div>
-            <h3 class="text-xl font-light text-foreground">Explore Related Industries</h3>
-            <p class="text-xs text-muted-foreground mt-1">Other trades and services we fund</p>
+            <h3 class="text-lg font-semibold text-foreground">Related Sector Programs</h3>
+            <p class="text-xs text-muted-foreground mt-0.5">Explore adjacent business funding paths</p>
           </div>
           <a href="/industries" class="text-xs font-semibold text-primary hover:underline flex items-center gap-1">
-            View all industries <Icon name="arrow-right" class="size-3" />
+            Browse all programs
           </a>
         </div>
 
@@ -287,12 +285,12 @@ const relatedIndustries = (currentCat?.items || []).filter((i) => i.slug !== ite
           {relatedIndustries.map((rel) => (
             <a
               href={`/industries/${rel.slug}`}
-              class="flex items-center gap-3 p-4 bg-card border border-border rounded-xl shadow-sm hover:border-primary/40 hover:-translate-y-0.5 transition"
+              class="group flex items-center gap-3 p-4 bg-card border border-border/80 rounded-xl no-underline hover:border-primary/40 transition-all"
             >
-              <span class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+              <div class="w-9 h-9 rounded-lg bg-secondary flex items-center justify-center shrink-0 border border-border/50">
                 <IndustryIcon item={rel} class={categoryIconColor[color]} />
-              </span>
-              <span class="text-sm font-semibold text-foreground truncate">{rel.name}</span>
+              </div>
+              <span class="text-sm font-semibold text-foreground truncate group-hover:text-primary transition-colors">{rel.name}</span>
             </a>
           ))}
         </div>
@@ -305,11 +303,12 @@ const relatedIndustries = (currentCat?.items || []).filter((i) => i.slug !== ite
     <div class="max-w-2xl mx-auto flex flex-col items-center gap-4">
       <h2 class="text-3xl font-light tracking-tight">Ready to finance your {item.name.toLowerCase()} business?</h2>
       <p class="text-primary-foreground/80 text-sm max-w-md">
-        Take 5 minutes to complete our online application and receive decision offers within 24 hours.
+        Submit basic monthly revenue details for formal underwriting evaluation within 24 hours.
       </p>
       <Button as="a" href="/solutions/apply" variant="secondary" class="mt-2 h-11 px-8 text-sm font-medium">
-        Apply Now
+        Start Application
       </Button>
     </div>
   </section>
 </Layout>
+

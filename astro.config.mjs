@@ -87,6 +87,7 @@ export default defineConfig({
         'astro/content/runtime',
         'astro/content/runtime-assets',
         'astro/assets/services/noop',
+        'astro/app/entrypoint/dev',
         // astro/zod is Astro's re-exported zod, pulled in by astro:actions /
         // astro:schema. Discovered lazily on the first request that reaches it
         // → stale astro_zod.js?v= 404.

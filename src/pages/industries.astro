@@ -25,61 +25,79 @@ const chipLabel: Record<string, string> = {
 };
 
 const filters = [
-  { key: 'all', label: 'All' },
+  { key: 'all', label: 'All Categories' },
   ...industryCategories.map((c) => ({ key: c.key, label: chipLabel[c.key] ?? c.label })),
 ];
 ---
 
 <Layout title="All Industries | Funded Experts" description="Funding built for your industry. Browse every industry we fund and find what fits your business.">
+  <!-- Header Section -->
   <header
-    class="relative overflow-hidden text-center px-6 py-20 sm:py-28 bg-cover bg-center"
-    style={`background-image: url('${optimizedHeroBg.src}')`}
+    class="hero-banner relative border-b border-border/60 py-16 sm:py-20 px-6 bg-cover bg-center"
+    style={`--hero-img: url('${optimizedHeroBg.src}')`}
   >
-    <span class="absolute inset-0 bg-gradient-to-b from-background/5 via-background/40 to-background pointer-events-none"></span>
-
-    <div class="relative z-10 max-w-3xl mx-auto">
-      <div class="text-xs font-semibold tracking-widest text-primary uppercase mb-4">Industries we fund</div>
-      <h1 class="text-4xl sm:text-5xl font-light tracking-tight leading-tight text-foreground">Funding built for your industry.</h1>
-      <p class="text-lg text-muted-foreground mt-4 max-w-md mx-auto">Same-day decisions, shaped around how your industry actually earns.</p>
-
-      <div class="relative max-w-md mx-auto mt-8">
-        <svg class="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4-4"></path></svg>
-        <input
-          id="fe-search"
-          type="text"
-          placeholder={`Search ${total} industries…`}
-          class="w-full box-border pl-11 pr-4 py-3.5 rounded-full border border-border bg-background text-foreground text-[15px] outline-none shadow-sm focus:ring-2 focus:ring-ring"
-        />
+    <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 items-end">
+      <div class="lg:col-span-7 flex flex-col items-start gap-4">
+        <div class="text-sm font-semibold tracking-wide text-sky-700 dark:text-sky-400 uppercase">
+          Industry Directory // <span class="font-mono tabular-nums">{total} Active Programs</span>
+        </div>
+        <h1 class="text-3xl sm:text-5xl font-light tracking-tight leading-tight text-slate-900 dark:text-white">
+          Funding built around how your business actually operates.
+        </h1>
+        <p class="text-base sm:text-lg text-slate-600 dark:text-slate-300 max-w-xl leading-relaxed">
+          From seasonal retail shifts to heavy trade equipment—same-day decisions tailored to your real cash flow.
+        </p>
       </div>
 
-      <div class="flex flex-wrap gap-2.5 justify-center mt-6 max-w-3xl mx-auto">
-        {filters.map((f, i) => (
-          <button
-            data-filter={f.key}
-            class:list={[
-              'px-4 py-2 rounded-full border text-[13.5px] font-medium cursor-pointer transition-colors',
-              i === 0 ? 'bg-foreground text-background border-foreground' : 'bg-background text-muted-foreground border-border hover:border-foreground/30',
-            ]}
-          >
-            {f.label}
-          </button>
-        ))}
+      <div class="lg:col-span-5 w-full">
+        <div class="bg-card/95 backdrop-blur-xs border border-border p-5 rounded-xl">
+          <label for="fe-search" class="block text-xs font-mono font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+            Search Industry Directory
+          </label>
+          <div class="relative w-full">
+            <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4-4"></path></svg>
+            <input
+              id="fe-search"
+              type="text"
+              placeholder={`Type industry name (e.g. Trucking, Retail)...`}
+              class="w-full box-border pl-10 pr-4 py-3 rounded-lg border border-border bg-background text-foreground text-sm outline-none transition focus:border-primary focus:ring-1 focus:ring-primary"
+            />
+          </div>
+          <div class="flex items-center justify-between text-xs text-muted-foreground mt-3 pt-3 border-t border-border/50 font-mono">
+            <span>Showing <strong id="fe-count" class="text-foreground font-semibold tabular-nums">{total}</strong> of <span class="tabular-nums">{total}</span> industries</span>
+            <span class="text-emerald-600 dark:text-emerald-400 font-medium">Updated 2026</span>
+          </div>
+        </div>
       </div>
-      <p class="text-[13.5px] text-muted-foreground mt-5">
-        Showing <span id="fe-count" class="text-foreground font-semibold">{total}</span> of {total} industries
-      </p>
     </div>
   </header>
 
-  <main class="max-w-6xl mx-auto px-6 py-14">
+  <!-- Filter Bar -->
+  <div class="sticky top-0 z-20 bg-background/95 backdrop-blur-md border-b border-border px-6 py-3.5">
+    <div class="max-w-6xl mx-auto flex items-center gap-2 overflow-x-auto no-scrollbar">
+      {filters.map((f, i) => (
+        <button
+          data-filter={f.key}
+          class:list={[
+            'px-3.5 py-1.5 rounded-lg text-xs font-mono font-medium shrink-0 cursor-pointer border transition-colors',
+            i === 0 ? 'bg-primary text-primary-foreground border-primary' : 'bg-secondary/60 text-muted-foreground border-border/80 hover:border-primary/40 hover:text-foreground',
+          ]}
+        >
+          {f.label}
+        </button>
+      ))}
+    </div>
+  </div>
+
+  <!-- Main Industry Catalog Grid -->
+  <main class="max-w-6xl mx-auto px-6 py-12 sm:py-16">
     {industryCategories.map((cat) => (
-      <div data-group={cat.key} class="mb-12">
-        <div class="flex items-center gap-3.5 mb-5">
-          <span class:list={['w-2.5 h-2.5 rounded-full shrink-0', categoryDotColor[cat.color]]}></span>
-          <span class="text-xs font-semibold tracking-widest text-muted-foreground uppercase whitespace-nowrap">{cat.label}</span>
-          <span class="flex-1 h-px bg-border"></span>
+      <div data-group={cat.key} class="mb-14">
+        <div class="flex items-center gap-3 mb-6 pb-2 border-b border-border/60">
+          <h2 class="text-sm font-mono font-bold tracking-wider text-foreground uppercase">{cat.label}</h2>
+          <span class="text-xs font-mono text-muted-foreground tabular-nums">({cat.items.length})</span>
         </div>
-        <div class="grid gap-4" style="grid-template-columns: repeat(auto-fill, minmax(232px, 1fr));">
+        <div class="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
           {cat.items.map((item) => (
             <IndustryCard item={item} categoryKey={cat.key} color={cat.color} />
           ))}
@@ -87,30 +105,39 @@ const filters = [
       </div>
     ))}
 
-    <div id="fe-noresults" class="hidden text-center py-16">
-      <p class="text-lg text-muted-foreground">No industries match that search. <span class="text-primary font-semibold">We still likely fund it</span>, try the calculator below.</p>
+    <div id="fe-noresults" class="hidden text-center py-20 bg-card border border-border rounded-xl p-8 max-w-xl mx-auto">
+      <p class="text-base text-foreground font-medium mb-1">No exact industry match found</p>
+      <p class="text-xs text-muted-foreground leading-relaxed">
+        If you generate revenue and have a business bank account, we almost certainly fund your sector.
+      </p>
+      <a href="/solutions/apply" class="inline-flex items-center gap-1.5 mt-4 text-xs font-semibold text-primary hover:underline">
+        Check qualification directly
+      </a>
     </div>
   </main>
 
-  <section class="bg-secondary px-6 py-16 sm:py-20">
-    <div class="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-8 text-center sm:text-left pb-14 border-b border-border/60">
+  <!-- Bottom CTA & Trust Section -->
+  <section class="bg-secondary/40 border-t border-border/60 px-6 py-16 sm:py-20">
+    <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-8 pb-12 border-b border-border/60">
       <div>
-        <h2 class="text-2xl sm:text-3xl font-light tracking-tight text-foreground">Don't see your industry?</h2>
-        <p class="text-muted-foreground leading-relaxed mt-2 max-w-md">This list isn't the limit. If you run a business and bring in revenue, there's almost always a path.</p>
+        <span class="text-sm font-semibold tracking-wide text-sky-600 dark:text-sky-400 uppercase">Custom Solutions</span>
+        <h2 class="text-2xl sm:text-3xl font-light tracking-tight text-foreground mt-1">Don't see your specific trade listed?</h2>
+        <p class="text-muted-foreground text-sm leading-relaxed mt-2 max-w-xl">
+          Our underwriting evaluates gross monthly deposits, not rigid industry codes. If your business brings in revenue, we can structure funding.
+        </p>
       </div>
-      <Button as="a" href="/solutions/apply" class="shrink-0 gap-2">
-        Check what you qualify for
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="M13 6l6 6-6 6"></path></svg>
+      <Button as="a" href="/solutions/apply" class="shrink-0 px-6 h-11 text-sm font-medium">
+        Apply for Custom Funding
       </Button>
     </div>
 
-    <div class="max-w-3xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-x-6 gap-y-10 text-center pt-14">
+    <div class="max-w-4xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-6 text-center pt-12">
       {trustStats.map((stat) => (
         <IconStat
           icon={stat.icon}
           label={stat.label}
           value={stat.value}
-          iconBg="bg-primary/15"
+          iconBg="bg-primary/10"
           iconColor="text-primary"
           labelColor="text-muted-foreground"
           valueColor="text-foreground"
@@ -132,12 +159,12 @@ const filters = [
       let activeCat = 'all'
 
       const setChip = (chip: HTMLButtonElement, active: boolean) => {
-        chip.classList.toggle('bg-foreground', active)
-        chip.classList.toggle('text-background', active)
-        chip.classList.toggle('border-foreground', active)
-        chip.classList.toggle('bg-background', !active)
+        chip.classList.toggle('bg-primary', active)
+        chip.classList.toggle('text-primary-foreground', active)
+        chip.classList.toggle('border-primary', active)
+        chip.classList.toggle('bg-secondary/60', !active)
         chip.classList.toggle('text-muted-foreground', !active)
-        chip.classList.toggle('border-border', !active)
+        chip.classList.toggle('border-border/80', !active)
       }
 
       const apply = () => {
@@ -174,3 +201,4 @@ const filters = [
     document.addEventListener('astro:page-load', initIndustryFilter)
   </script>
 </Layout>
+

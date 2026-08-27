@@ -1,6 +1,8 @@
 ---
+import { getImage } from 'astro:assets';
 import IndustryIcon from '@/components/IndustryIcon.astro';
-import { categoryBannerColor, categoryIconColor, type Industry, type IndustryCategoryColor } from '@/data/industries';
+import { categoryIconColor, type Industry, type IndustryCategoryColor } from '@/data/industries';
+import { getIndustryImage } from '@/data/industry-images';
 
 type Props = {
   item: Industry;
@@ -9,6 +11,9 @@ type Props = {
 };
 
 const { item, categoryKey, color } = Astro.props;
+
+const cardImage = getIndustryImage(item.slug, categoryKey);
+const optimizedCardImage = await getImage({ src: cardImage, format: 'webp', width: 600, height: 350 });
 ---
 
 <a
@@ -16,15 +21,35 @@ const { item, categoryKey, color } = Astro.props;
   data-card
   data-name={item.name.toLowerCase()}
   data-cat={categoryKey}
-  class="flex flex-col bg-card border border-border rounded-2xl overflow-hidden no-underline shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+  class="group flex flex-col overflow-hidden bg-card border border-border/80 rounded-xl no-underline hover:border-primary/50 transition-all duration-300 hover:shadow-md"
 >
-  <span class:list={['relative overflow-hidden h-24 flex items-center px-4 bg-gradient-to-br', categoryBannerColor[color]]}>
-    <IndustryIcon item={item} size={92} strokeWidth={1.4} class={`absolute -right-3.5 -bottom-4.5 opacity-15 ${categoryIconColor[color]}`} />
-    <span class="w-13 h-13 rounded-2xl bg-white/80 dark:bg-white/10 border border-white/90 dark:border-white/10 shadow-md flex items-center justify-center relative z-10">
-      <IndustryIcon item={item} class={categoryIconColor[color]} />
-    </span>
-  </span>
-  <span class="flex flex-col gap-2 px-4 py-4">
-    <span class="text-[15.5px] font-semibold text-foreground">{item.name}</span>
-  </span>
+  <div class="relative h-32 w-full overflow-hidden bg-muted">
+    <img
+      src={optimizedCardImage.src}
+      alt={item.name}
+      class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+      loading="lazy"
+    />
+    <div class="absolute inset-0 bg-black/25"></div>
+    <div class="absolute bottom-3 left-3 flex items-center gap-2">
+      <div class="w-8 h-8 rounded-lg bg-background/90 backdrop-blur-xs flex items-center justify-center shrink-0 border border-border/50 shadow-xs">
+        <IndustryIcon item={item} class={`size-4 ${categoryIconColor[color]}`} />
+      </div>
+    </div>
+  </div>
+
+  <div class="p-4 flex flex-col justify-between flex-1">
+    <div>
+      <h3 class="text-base font-semibold text-foreground tracking-tight group-hover:text-primary transition-colors">
+        {item.name}
+      </h3>
+      <p class="text-xs text-muted-foreground mt-1 line-clamp-1 font-mono tabular-nums">
+        Up to $500k · 24h approval
+      </p>
+    </div>
+    <div class="mt-4 pt-3 border-t border-border/50 flex items-center justify-between text-[11px] font-mono font-medium text-muted-foreground group-hover:text-primary transition-colors">
+      <span>View Program Spec</span>
+    </div>
+  </div>
 </a>
+

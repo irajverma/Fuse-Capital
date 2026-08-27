@@ -6,6 +6,12 @@
       "sourceType": "github",
       "skillPath": "skills/engineering/code-review/SKILL.md",
       "computedHash": "b4f17857c85ca60af1df7d0b623dd03c2a48419f6123e714f3d9748ca744a1bf"
+    },
+    "color-accessibility": {
+      "source": "aj-geddes/useful-ai-prompts",
+      "sourceType": "github",
+      "skillPath": "skills/color-accessibility/SKILL.md",
+      "computedHash": "a948a4c18efb1cfc0e4545816457eaab4c488625776661350f74fb049efeddcb"
     }
   }
 }
