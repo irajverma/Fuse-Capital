@@ -30,7 +30,7 @@ import heroGasStations from '@/assets/hero-gasstations.jpg';
 
 import heroLaw from '@/assets/hero-law.jpg';
 import heroAccounting from '@/assets/hero-accounting.jpg';
-import heroRealEstate from '@/assets/building.png';
+import heroRealEstate from '@/assets/hero-realestate.png';
 import heroStaffing from '@/assets/hero-staffing.jpg';
 import heroMarketing from '@/assets/hero-marketing.jpg';
 import heroDefault from '@/assets/industries-hero.jpg';
