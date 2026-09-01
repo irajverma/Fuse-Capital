@@ -9,7 +9,7 @@ import IconStat from '@/components/IconStat.astro';
 import heroBg from '../assets/industries-hero.jpg';
 import { industryCategories, categoryDotColor } from '@/data/industries';
 
-const optimizedHeroBg = await getImage({ src: heroBg, format: 'webp' });
+const optimizedHeroBg = await getImage({ src: heroBg, format: 'webp', width: 2000, quality: 90 });
 
 const trustStats = [
   { icon: 'calendar', label: 'Serving small business', value: '13+ years' },
@@ -38,13 +38,13 @@ const filters = [
   >
     <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 items-end">
       <div class="lg:col-span-7 flex flex-col items-start gap-4">
-        <div class="text-sm font-semibold tracking-wide text-sky-700 dark:text-sky-400 uppercase">
+        <div class="text-sm font-semibold tracking-wide text-sky-800 dark:text-sky-400 uppercase">
           Industry Directory // <span class="font-mono tabular-nums">{total} Active Programs</span>
         </div>
-        <h1 class="text-3xl sm:text-5xl font-light tracking-tight leading-tight text-slate-900 dark:text-white">
+        <h1 class="text-3xl sm:text-5xl font-normal tracking-tight leading-tight text-slate-950 dark:text-white">
           Funding built around how your business actually operates.
         </h1>
-        <p class="text-base sm:text-lg text-slate-600 dark:text-slate-300 max-w-xl leading-relaxed">
+        <p class="text-base sm:text-lg text-slate-700 dark:text-slate-200 max-w-xl leading-relaxed font-normal">
           From seasonal retail shifts to heavy trade equipment—same-day decisions tailored to your real cash flow.
         </p>
       </div>

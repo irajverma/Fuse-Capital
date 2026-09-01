@@ -18,9 +18,9 @@ export type IndustryDetail = {
 export const industryDetailsMap: Record<string, Partial<IndustryDetail>> = {
   'hospitality-healthcare': {
     heroTagline: 'Hospitality & Healthcare Funding',
-    heroHeadline: 'Hospitality & Healthcare providers choose Funded Experts.',
+    heroHeadline: 'Hospitality & Healthcare choose Funded Experts.',
     heroDescription:
-      'From medical practices, dental clinics, and wellness centers to hotels, restaurants, and catering services—hospitality and healthcare operations depend on constant cash flow for staffing, specialized equipment, inventory, and facility maintenance. We deliver fast, flexible working capital so you can maintain exceptional patient and guest care without cash flow interruptions.',
+      'Hospitality and healthcare operations depend on constant cash flow for staffing, specialized equipment, and facility maintenance. We deliver fast, flexible working capital so you can maintain exceptional patient and guest care.',
     stat1Value: '24h',
     stat1Label: 'average turnaround time',
     stat2Value: '4.8/5',
@@ -65,9 +65,9 @@ export const industryDetailsMap: Record<string, Partial<IndustryDetail>> = {
   },
   'logistics-transportation': {
     heroTagline: 'Logistics & Transportation Funding',
-    heroHeadline: 'Freight, trucking & logistics fleets grow with Funded Experts.',
+    heroHeadline: 'Logistics & Transportation choose Funded Experts.',
     heroDescription:
-      'Transportation companies face high upfront expenses for fuel, maintenance, insurance premiums, and driver payroll while waiting 30 to 60 days on broker invoices. We provide specialized freight capital, equipment financing, and lines of credit to keep your fleet moving and profitable.',
+      'Transportation companies face high upfront expenses for fuel, maintenance, and driver payroll while waiting on broker invoices. We provide specialized freight capital and lines of credit to keep your fleet moving and profitable.',
     stat1Value: '24h',
     stat1Label: 'speed to fund',
     stat2Value: '4.8/5',
@@ -108,9 +108,9 @@ export const industryDetailsMap: Record<string, Partial<IndustryDetail>> = {
   },
   retail: {
     heroTagline: 'Retail & E-Commerce Funding',
-    heroHeadline: 'Retailers and e-commerce stores scale with Funded Experts.',
+    heroHeadline: 'Retail & E-Commerce choose Funded Experts.',
     heroDescription:
-      'Success in retail demands buying inventory ahead of seasonal surges, launching digital ad campaigns, and expanding store locations. We deliver fast, flexible funding options that scale with your sales volume.',
+      'Success in retail demands buying inventory ahead of seasonal surges and expanding store locations. We deliver fast, flexible funding options that scale with your sales volume.',
     stat1Value: '13+',
     stat1Label: 'years in business financing',
     stat2Value: '4.8/5',
@@ -135,7 +135,7 @@ export const industryDetailsMap: Record<string, Partial<IndustryDetail>> = {
       },
       {
         title: 'Fast approval with minimal paperwork',
-        description: 'No tax returns or lengthy financials required for most funding amounts—just recent bank statements.',
+        description: 'No tax returns or lengthy financials required for most funding amounts. Just recent bank statements.',
       },
     ],
     faqs: [
@@ -151,9 +151,9 @@ export const industryDetailsMap: Record<string, Partial<IndustryDetail>> = {
   },
   construction: {
     heroTagline: 'Construction & Trades Funding',
-    heroHeadline: 'Construction businesses choose Funded Experts.',
+    heroHeadline: 'Construction & Trades choose Funded Experts.',
     heroDescription:
-      'Contractors don\'t have a revenue problem; they have a timing problem. The average general contractor waits 90 days to get paid for completed work. Money goes out for payroll and equipment before progress payments land. We provide fast, flexible working capital so you can bid bigger jobs and bridge cash flow gaps.',
+      'Contractors face a timing problem. You wait up to 90 days to get paid, but money goes out for payroll and equipment immediately. We provide fast working capital so you can bid bigger jobs and bridge cash flow gaps.',
     stat1Value: '13+',
     stat1Label: 'years of lending experience',
     stat2Value: '4.8/5',
@@ -198,9 +198,9 @@ export const industryDetailsMap: Record<string, Partial<IndustryDetail>> = {
   },
   restaurants: {
     heroTagline: 'Food & Hospitality Funding',
-    heroHeadline: 'Restaurants and eateries grow with Funded Experts.',
+    heroHeadline: 'Restaurants choose Funded Experts.',
     heroDescription:
-      'Food service runs on tight margins and unpredictable seasonality. From equipment upgrades to inventory stocking and patio expansions, we deliver fast working capital so you can focus on serving guests.',
+      'Food service runs on tight margins and unpredictable seasonality. We deliver fast working capital for equipment upgrades and inventory stocking so you can focus on serving guests.',
     stat1Value: '24h',
     stat1Label: 'average turnaround time',
     stat2Value: '4.8/5',
@@ -241,10 +241,10 @@ export function getIndustryDetails(slug: string, name: string): IndustryDetail {
   const custom = industryDetailsMap[slug] || {};
   return {
     heroTagline: custom.heroTagline || `${name} Business Funding`,
-    heroHeadline: custom.heroHeadline || `${name} businesses choose Funded Experts.`,
+    heroHeadline: custom.heroHeadline || `${name} choose Funded Experts.`,
     heroDescription:
       custom.heroDescription ||
-      `${name} companies need fast, reliable working capital to manage payroll, purchase inventory, and seize growth opportunities. We provide tailored business loans and lines of credit designed around how ${name.toLowerCase()} businesses operate.`,
+      `${name} businesses need fast, reliable working capital for payroll, inventory, and growth. We provide funding designed around how ${name.toLowerCase()} operations work.`,
     stat1Value: custom.stat1Value || '13+',
     stat1Label: custom.stat1Label || 'years of lending experience',
     stat2Value: custom.stat2Value || '4.8/5',

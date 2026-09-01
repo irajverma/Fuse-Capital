@@ -225,11 +225,11 @@ html[data-nav-engaged] [data-nav-bar][data-reveal-on-scroll] {
 }
 
 .hero-banner {
-  background-image: linear-gradient(to right, rgba(248, 250, 252, 0.65), rgba(248, 250, 252, 0.35)), var(--hero-img);
+  background-image: linear-gradient(to right, #ffffff 0%, rgba(255, 255, 255, 0.92) 42%, rgba(255, 255, 255, 0.35) 72%, rgba(255, 255, 255, 0.05) 100%), var(--hero-img);
 }
 
 .dark .hero-banner,
 :is(.dark *) .hero-banner {
-  background-image: linear-gradient(to right, rgba(15, 23, 42, 0.88), rgba(15, 23, 42, 0.70)), var(--hero-img);
+  background-image: linear-gradient(to right, #0f172a 0%, rgba(15, 23, 42, 0.92) 42%, rgba(15, 23, 42, 0.35) 72%, rgba(15, 23, 42, 0.05) 100%), var(--hero-img);
 }
 
